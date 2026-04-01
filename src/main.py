@@ -2,7 +2,7 @@ import csv
 import datetime 
 
 FILE = "../data/despesas.csv"
-
+## Funções
 def add_despesa():
     montante = float(input("Valor (€): "))
     categoria = input("Categoria: ")
