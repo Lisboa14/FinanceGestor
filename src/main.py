@@ -2,16 +2,26 @@ import csv
 import datetime 
 
 FILE = "../data/despesas.csv"
+Categorias = ["Compras","Transporte","Lazer","Saúde"]
 ## Funções
 def add_despesa():
     montante = float(input("Valor (€): "))
-    categoria = input("Categoria: ")
+
+    print(f"Categorias disponíveis: {', '.join(Categorias)}")
+
+    while True:
+        categoriaEscolhida = input("Escolha uma categoria:")
+        if categoriaEscolhida in Categorias:
+            break
+        else:
+            print("Categoria inválida!!!")
+
     descricao = input("Descrição: ")
     data =datetime.datetime.now().strftime("%d/%m/%Y")
    
     file = open(FILE,"a", newline="")
     escrever = csv.writer(file)
-    escrever.writerow([montante, categoria, descricao,data])
+    escrever.writerow([montante, categoriaEscolhida, descricao,data])
     file.close()
 
     print("Despesa adicionada com sucesso!!!")
