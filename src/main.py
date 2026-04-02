@@ -1,6 +1,7 @@
 import csv 
 import datetime 
-
+import plotext as plt 
+import os 
 FILE = "../data/despesas.csv"
 FILECATEGORIAS = "../data/categorias.txt"
 #Categorias = ["Compras","Transporte","Lazer","Saúde"]
@@ -70,15 +71,45 @@ def total_despesas():
     file.close()
 
     print(f"\n Total de gastos: {total:.2f}€ \n")
+
+def grafico_categorias():
+    totais = {}
+
+    with open(FILE,"r") as file:
+        leitor = csv.reader(file)
+
+        for row in leitor:
+            categoria = row[1]
+            valor=float(row[0])
+
+            if categoria in totais:
+                totais[categoria] += valor
+            else:
+                totais[categoria] = valor
+    if not totais:
+        print("Sem dados para mostrar")
+        return
+    categorias = list(totais.keys())
+    valores = list(totais.values())
+
+    plt.clear_figure()
+    plt.bar(categorias, valores)
+    plt.title("Gráfico Despesa por Categorias")
+    plt.xlabel("Categorias")
+    plt.show()
+def limpar_terminal():
+    os.system('cls' if os.name=='nt' else 'clear')
 def main():
     while True:
         print("****** Gestor de finanças *******")
         print("1-) Adicionar despesa")
         print("2-) Ver despesas")
         print("3-) Ver total de despesas")
+        print("4-) Ver gráficos por categorias")
         print("0-) Sair do programa")
 
         escolha = input("Escolha: ")
+        limpar_terminal()
 
         if escolha == "1":
             add_despesa()
@@ -86,6 +117,8 @@ def main():
             ver_despesas()
         elif escolha== "3":
             total_despesas()
+        elif escolha == "4":
+            grafico_categorias()
         elif escolha == "0":
             print("\n Muito obrigado por utilizar o programa FinanceGestor\n")
             break
