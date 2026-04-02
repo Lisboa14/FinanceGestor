@@ -2,19 +2,35 @@ import csv
 import datetime 
 
 FILE = "../data/despesas.csv"
-Categorias = ["Compras","Transporte","Lazer","Saúde"]
+FILECATEGORIAS = "../data/categorias.txt"
+#Categorias = ["Compras","Transporte","Lazer","Saúde"]
 ## Funções
 def add_despesa():
     montante = float(input("Valor (€): "))
-
-    print(f"Categorias disponíveis: {', '.join(Categorias)}")
-
+    
+    categorias= carregar_categorias()
+    print("\n Categorias dispovineis")
+    for categoria in categorias:
+        print(f"->{categoria}")
     while True:
         categoriaEscolhida = input("Escolha uma categoria:")
-        if categoriaEscolhida in Categorias:
+        if categoriaEscolhida in categorias:
             break
         else:
             print("Categoria inválida!!!")
+        
+            opcao=input("Deseja criar uma nova categoria? (s/n)")
+
+            if opcao == "s":
+                with open(FILECATEGORIAS, "a") as f:
+                   f.write(categoriaEscolhida + "\n") 
+                print("Categoria Adicionada com sucesso!!!")
+                break
+            elif opcao== "n":
+                print("Volta para o menu principal")
+                return
+            else:
+                print("opcao inválida")
 
     descricao = input("Descrição: ")
     data =datetime.datetime.now().strftime("%d/%m/%Y")
@@ -25,6 +41,14 @@ def add_despesa():
     file.close()
 
     print("Despesa adicionada com sucesso!!!")
+
+def carregar_categorias():
+    categorias = []
+    
+    file2 = open(FILECATEGORIAS,"r")
+    for linha in file2:
+        categorias.append(linha.strip())
+    return categorias
 
 def ver_despesas():
     file = open(FILE, "r")
@@ -63,7 +87,7 @@ def main():
         elif escolha== "3":
             total_despesas()
         elif escolha == "0":
-            print("\n Muito obrigado por utlizador o programa FinanceGestor\n")
+            print("\n Muito obrigado por utilizar o programa FinanceGestor\n")
             break
         else:
             print("Opção inválida")
