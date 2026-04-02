@@ -2,3 +2,4 @@ __pycache__/
 *.pyc
 data/despesas.csv
 data/categorias.txt
+src/db.py 

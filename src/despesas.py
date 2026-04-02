@@ -1,18 +1,21 @@
-import csv
+from db import fetch, execute
+#import csv
 import datetime 
-FILE = "../data/despesas.csv"
-FILECATEGORIAS = "../data/categorias.txt"
+#FILE = "../data/despesas.csv"
+#FILECATEGORIAS = "../data/categorias.txt"
 
 def add_despesa():
     montante = float(input("Valor (€): "))
     
     categorias= carregar_categorias()
-    print("\n Categorias dispovineis")
+    print("\n Categorias disponiveis:")
     for categoria in categorias:
         print(f"->{categoria}")
     while True:
         categoriaEscolhida = input("Escolha uma categoria:")
         if categoriaEscolhida in categorias:
+            sql = "SELECT id FROM categorias WHERE nome=%s"
+            categoria_id = fetch(sql,(categoriaEscolhida,))[0][0]
             break
         else:
             print("Categoria inválida!!!")
@@ -20,9 +23,9 @@ def add_despesa():
             opcao=input("Deseja criar uma nova categoria? (s/n)")
 
             if opcao == "s":
-                with open(FILECATEGORIAS, "a") as f:
-                   f.write(categoriaEscolhida + "\n") 
+                execute("INSERT INTO categorias (nome) VALUES (%s)", (categoriaEscolhida,))
                 print("Categoria Adicionada com sucesso!!!")
+                categoria_id = fetch("SELECT id FROM categorias WHERE nome=%s", (categoriaEscolhida,))[0][0]
                 break
             elif opcao== "n":
                 print("Volta para o menu principal")
@@ -31,41 +34,31 @@ def add_despesa():
                 print("opcao inválida")
 
     descricao = input("Descrição: ")
-    data =datetime.datetime.now().strftime("%d/%m/%Y")
+    data =datetime.datetime.now().strftime("%Y-%m-%d")
    
-    file = open(FILE,"a", newline="")
-    escrever = csv.writer(file)
-    escrever.writerow([montante, categoriaEscolhida, descricao,data])
-    file.close()
-
+    sql = "INSERT INTO despesas (data,categoria_id, descricao, valor) VALUES (%s,%s,%s,%s)"
+    execute(sql,(data, categoria_id, descricao, montante))
     print("Despesa adicionada com sucesso!!!")
 
 def carregar_categorias():
-    categorias = []
-    
-    file2 = open(FILECATEGORIAS,"r")
-    for linha in file2:
-        categorias.append(linha.strip())
+    sql = "SELECT nome FROM categorias"
+    categorias = [c[0] for c in fetch(sql)]
     return categorias
 
 def ver_despesas():
-    file = open(FILE, "r")
-    leitor=csv.reader(file)
-
-    print("\n Lista de despesas: \n")
-
-    for row in leitor:
-        print(f"Despesa: {row[0]}€ | Categoria:{row[1]} | Descrição:{row[2]} | Data:{row[3]}")
-    
-    file.close()
+    sql = """
+        SELECT d.valor, c.nome, d.descricao, d.data
+        FROM despesas d 
+        JOIN categorias c ON d.categoria_id = c.id
+    """
+    despesas = fetch(sql)
+        
+    print("\nLista de despesas:\n")
+    for d in despesas:
+        print(f"Despesa: {d[0]:.2f}€ | Categoria: {d[1]} | Descrição: {d[2]} | Data: {d[3]}")
 
 def total_despesas():
-    total = 0;
-    file = open(FILE, "r")
-    leitor = csv.reader(file)
-    for row in leitor:
-        total+= float(row[0])
-    file.close()
-
+    sql = "SELECT SUM(valor) FROM despesas"
+    total = fetch(sql)[0][0] or 0
     print(f"\n Total de gastos: {total:.2f}€ \n")
 
