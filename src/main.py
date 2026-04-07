@@ -2,13 +2,15 @@ import plotext as plt
 import os 
 from despesas import add_despesa, ver_despesas, total_despesas
 from graficos import grafico_categorias
-from orcamento import definir_orcamento, ver_orcamento
+from orcamento import definir_orcamento, ver_orcamento, orcamento_dashboard
 
 def limpar_terminal():
     os.system('cls' if os.name=='nt' else 'clear')
 def main():
     while True:
+        restante = orcamento_dashboard()
         print("****** Gestor de finanças *******")
+        print(f"Orçamento deste mês: {restante}€\n")
         print("1-) Adicionar despesa")
         print("2-) Ver despesas")
         print("3-) Ver total de despesas")
