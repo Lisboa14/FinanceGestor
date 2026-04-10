@@ -62,3 +62,20 @@ def total_despesas():
     total = fetch(sql)[0][0] or 0
     print(f"\n Total de gastos: {total:.2f}€ \n")
 
+def ver_despesas_categoria():
+    categoria = input("Escreva a Categoria: ")
+    sql = """
+    SELECT d.valor, c.nome, d.descricao, d.data
+    FROM despesas d 
+    JOIN categorias c ON d.categoria_id = c.id
+    WHERE c.nome = %s 
+    """
+    despesas = fetch(sql ,(categoria,))
+
+    print("\nLista de despesas:\n")
+    for d in despesas:
+        print(f"Despesa: {d[0]:.2f}€ | Categoria: {d[1]} | Descrição: {d[2]} | Data: {d[3]}")
+
+
+
+

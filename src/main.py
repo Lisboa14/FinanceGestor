@@ -1,6 +1,6 @@
 import plotext as plt 
 import os 
-from despesas import add_despesa, ver_despesas, total_despesas
+from despesas import add_despesa, ver_despesas, total_despesas, ver_despesas_categoria
 from graficos import grafico_categorias
 from orcamento import definir_orcamento, ver_orcamento, orcamento_dashboard
 
@@ -13,10 +13,13 @@ def main():
         print(f"Orçamento deste mês: {restante}€\n")
         print("1-) Adicionar despesa")
         print("2-) Ver despesas")
+        #Criar sub menus(Ter dentro do ver despesas o ver_despesas_categoria, etc...)
+
         print("3-) Ver total de despesas")
         print("4-) Ver gráficos por categorias")
         print("5-) Definir orçamento")
         print("6-) Ver orçamento mensal")
+        print("7-) Ver despesa por categoria")
         print("0-) Sair do programa")
 
         escolha = input("Escolha: ")
@@ -34,6 +37,8 @@ def main():
             definir_orcamento()
         elif escolha == "6":
             ver_orcamento()
+        elif escolha == "7":
+            ver_despesas_categoria()
         elif escolha == "0":
             print("\n Muito obrigado por utilizar o programa FinanceGestor\n")
             break
