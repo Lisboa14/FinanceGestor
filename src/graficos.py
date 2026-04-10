@@ -1,22 +1,26 @@
 import plotext as plt 
-import os 
-import csv
-FILE = "../data/despesas.csv"
+import os
+from db import fetch, execute
+##import csv
+##FILE = "../data/despesas.csv"
 
 def grafico_categorias():
     totais = {}
 
-    with open(FILE,"r") as file:
-        leitor = csv.reader(file)
+    sql = """
+    SELECT d.valor, c.nome 
+    FROM despesas d 
+    JOIN categorias c ON d.categoria_id = c.id 
+    """
+    resultados = fetch(sql)
+    for row in resultados:
+        valor=float(row[0])
+        categoria = row[1]
 
-        for row in leitor:
-            categoria = row[1]
-            valor=float(row[0])
-
-            if categoria in totais:
-                totais[categoria] += valor
-            else:
-                totais[categoria] = valor
+        if categoria in totais:
+            totais[categoria] += valor
+        else:
+            totais[categoria] = valor
     if not totais:
         print("Sem dados para mostrar")
         return
