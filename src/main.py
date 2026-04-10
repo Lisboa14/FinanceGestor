@@ -1,6 +1,6 @@
 import plotext as plt 
 import os 
-from despesas import add_despesa, ver_despesas, total_despesas, ver_despesas_categoria
+from despesas import add_despesa, ver_despesas, total_despesas, ver_despesas_categoria, ver_despesas_mes
 from graficos import grafico_categorias
 from orcamento import definir_orcamento, ver_orcamento, orcamento_dashboard
 
@@ -42,6 +42,7 @@ def menu_ver_despesas():
         print("\n *** Ver Despesas ***")
         print("1-) Ver Todos")
         print("2-) Por Categoria")
+        print("3-) Por Mês")
         print("0-) Voltar")
 
         escolha = input("Escolha: ")
@@ -51,6 +52,8 @@ def menu_ver_despesas():
             ver_despesas()
         elif escolha == "2":
             ver_despesas_categoria()
+        elif escolha == "3":
+            ver_despesas_mes()
         elif escolha == "0":
             break 
         else:

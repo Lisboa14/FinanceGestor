@@ -83,6 +83,22 @@ def ver_despesas_categoria():
     for d in despesas:
         print(f"Despesa: {d[0]:.2f}€ | Categoria: {d[1]} | Descrição: {d[2]} | Data: {d[3]}")
 
+def ver_despesas_mes():
+    mes = input("Mês (1-12)")
+
+    sql = """
+    SELECT d.valor, c.nome, d.descricao, d.data
+    FROM despesas d 
+    JOIN categorias c ON d.categoria_id = c.id 
+    WHERE MONTH(d.data) = %s 
+    """
+    despesas = fetch(sql,(mes,))
+    print("\nLista de despesas:\n")
+    for d in despesas:
+        print(f"Despesa: {d[0]:.2f}€ | Categoria: {d[1]} | Descrição: {d[2]} | Data: {d[3]}")
+
+
+
 
 
 
