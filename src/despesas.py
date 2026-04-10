@@ -63,7 +63,14 @@ def total_despesas():
     print(f"\n Total de gastos: {total:.2f}€ \n")
 
 def ver_despesas_categoria():
+    
+    categorias= carregar_categorias()
+    print("\n Categorias disponiveis:")
+    for categoria in categorias:
+        print(f"->{categoria}")
+   
     categoria = input("Escreva a Categoria: ")
+    
     sql = """
     SELECT d.valor, c.nome, d.descricao, d.data
     FROM despesas d 
@@ -75,6 +82,7 @@ def ver_despesas_categoria():
     print("\nLista de despesas:\n")
     for d in despesas:
         print(f"Despesa: {d[0]:.2f}€ | Categoria: {d[1]} | Descrição: {d[2]} | Data: {d[3]}")
+
 
 
 

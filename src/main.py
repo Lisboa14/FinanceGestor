@@ -13,13 +13,9 @@ def main():
         print(f"Orçamento deste mês: {restante}€\n")
         print("1-) Adicionar despesa")
         print("2-) Ver despesas")
-        #Criar sub menus(Ter dentro do ver despesas o ver_despesas_categoria, etc...)
-
-        print("3-) Ver total de despesas")
-        print("4-) Ver gráficos por categorias")
-        print("5-) Definir orçamento")
-        print("6-) Ver orçamento mensal")
-        print("7-) Ver despesa por categoria")
+        print("3-) Ver gráficos por categorias")
+        print("4-) Definir orçamento")
+        print("5-) Ver orçamento mensal")
         print("0-) Sair do programa")
 
         escolha = input("Escolha: ")
@@ -28,22 +24,37 @@ def main():
         if escolha == "1":
             add_despesa()
         elif escolha== "2":
-            ver_despesas()
-        elif escolha== "3":
-            total_despesas()
-        elif escolha == "4":
+            menu_ver_despesas()
+        elif escolha == "3":
             grafico_categorias()
-        elif escolha == "5":
+        elif escolha == "4":
             definir_orcamento()
-        elif escolha == "6":
+        elif escolha == "5":
             ver_orcamento()
-        elif escolha == "7":
-            ver_despesas_categoria()
         elif escolha == "0":
             print("\n Muito obrigado por utilizar o programa FinanceGestor\n")
             break
         else:
             print("Opção inválida")
+
+def menu_ver_despesas():
+    while True:
+        print("\n *** Ver Despesas ***")
+        print("1-) Ver Todos")
+        print("2-) Por Categoria")
+        print("0-) Voltar")
+
+        escolha = input("Escolha: ")
+        limpar_terminal()
+
+        if escolha == "1":
+            ver_despesas()
+        elif escolha == "2":
+            ver_despesas_categoria()
+        elif escolha == "0":
+            break 
+        else:
+            print("Opção Inválida")
 
 if __name__ == "__main__":
     main()
