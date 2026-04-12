@@ -60,7 +60,8 @@ def ver_despesas():
 def total_despesas():
     sql = "SELECT SUM(valor) FROM despesas"
     total = fetch(sql)[0][0] or 0
-    print(f"\n Total de gastos: {total:.2f}€ \n")
+    #print(f"\n Total de gastos: {total:.2f}€ \n")
+    return total
 
 def ver_despesas_categoria():
     

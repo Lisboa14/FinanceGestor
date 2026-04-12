@@ -1,4 +1,4 @@
-import plotext as plt 
+import matplotlib.pyplot as plt 
 import os
 from db import fetch, execute
 ##import csv
@@ -27,8 +27,7 @@ def grafico_categorias():
     categorias = list(totais.keys())
     valores = list(totais.values())
 
-    plt.clear_figure()
-    plt.bar(categorias, valores)
+    plt.pie(valores, labels=categorias, autopct='%1.1f%%')
     plt.title("Gráfico Despesa por Categorias")
     plt.xlabel("Categorias")
     plt.show()
