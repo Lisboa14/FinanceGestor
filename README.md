@@ -35,7 +35,7 @@ O **FinanceGestor** é uma aplicação de terminal (TUI) para gestão financeira
 | 💸 **Despesas** | Adicionar, listar, filtrar por categoria, mês ou data |
 | 📊 **Orçamento** | Definir orçamento mensal e acompanhar o progresso |
 | 🏦 **Poupanças** | Cálculo automático acumulado mês a mês |
-| 🍩 **Gráficos** | Gráfico de pizza por categorias com `matplotlib` |
+| 📈 **Gráficos** | Gráficos circulares por categorias com `matplotlib` |
 | 🖥️ **Dashboard** | Cards em tempo real com orçamento, gastos e poupanças |
 
 ---
@@ -44,7 +44,7 @@ O **FinanceGestor** é uma aplicação de terminal (TUI) para gestão financeira
 
 ```
 ──────────────────────────────────────────────────────────────
-◈ FINANCEGÉSTOR                  Monday, 13 de April de 2026  09:31
+◈ FINANCEGESTOR                  Monday, 13 de April de 2026  09:31
 ──────────────────────────────────────────────────────────────
 
   ╭─────────────╮  ╭─────────────╮  ╭─────────────╮  ╭─────────────╮
@@ -170,8 +170,6 @@ def get_connection():
     return conn
 ```
 
-> **Nota MAMP:** se usas MAMP no macOS, a porta por defeito é `8889`. Ajusta conforme necessário.
-
 ### 6 — Executar a aplicação
 
 ```bash
@@ -187,7 +185,7 @@ Após iniciar, navega pelo menu com os números do teclado:
 ```
 [1] Adicionar despesa   → introduz valor, categoria e descrição
 [2] Ver despesas        → filtra por todas / categoria / mês / data
-[3] Gráficos            → gráfico de pizza por categorias (abre janela)
+[3] Gráficos            → gráficos circulares por categorias (abre janela)
 [4] Definir orçamento   → define o orçamento do mês atual (formato YYYY-MM)
 [5] Ver orçamento       → mostra orçamento, gastos e saldo do mês
 [0] Sair
