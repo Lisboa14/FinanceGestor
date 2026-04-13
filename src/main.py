@@ -18,7 +18,7 @@ from despesas import (
 )
 from graficos import grafico_categorias
 from orcamento import definir_orcamento, ver_orcamento, orcamento_dashboard
-
+from poupancas import poupancas
 # ──────────────────────────────────────────────────────────────────────────
 console = Console()
 
@@ -67,12 +67,11 @@ def painel_orcamento():
         return
 
     restante = float(restante)
-
-    # Usamos total_despesas() para o gasto e inferimos o orçamento total.
+    mes = datetime.now().strftime("%Y-%m")
     gasto = float(total_despesas() or 0)
     
-
     orcamento_val = gasto + restante  # orçamento = gasto + restante
+    cofre = poupancas(mes, orcamento_val , gasto)
     # Cor do restante
     if restante < 0:
         cor_rest = DANGER
@@ -93,11 +92,17 @@ def painel_orcamento():
     t3 = Text()
     t3.append("DISPONÍVEL\n", style=f"dim {DIM}")
     t3.append(f"{restante:,.2f} €", style=f"bold {cor_rest}")
+    
+    t4 = Text()
+    t4.append("Poupanças\n", style=f"dim {DIM}")
+    t4.append(f"{cofre:,.2f} €", style=f"bold {cor_rest}")
+
 
     cards = [
         Panel(t1, border_style=DIM, box=box.ROUNDED, padding=(0, 2)),
         Panel(t2, border_style=DIM, box=box.ROUNDED, padding=(0, 2)),
         Panel(t3, border_style=DIM, box=box.ROUNDED, padding=(0, 2)),
+        Panel(t4, border_style=DIM, box=box.ROUNDED, padding=(0, 2)),
     ]
     console.print(Padding(Columns(cards, equal=True, expand=True), (1, 2)))
 
