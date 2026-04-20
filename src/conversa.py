@@ -129,5 +129,26 @@ def _total_categoria(texto_original:str, match)->str:
     total, nome = resultado[0]
     return f"Gastaste {float(total):.2f}€ em {nome}."
 
+def _maior_gasto()->str:
+    sql = """
+    SELECT d.valor, c.nome, d.descricao, d.data FROM despesas d 
+    JOIN categorias c ON d.categoria_id = c.id 
+    ORDER BY d.valor DESC LIMIT 1
+    """
+    resultado = fetch(sql)
+    if not resultado:
+        return "Ainda não tens despesas registadas."
+    v,cat,desc,data = resultado[0]
+    return f"O teu maior gasto foi '{desc}' - {float(v):.2f}€ em {cat} ({data})."
 
-
+def _menor_gasto()->str:
+    sql = """
+    SELECT d.valor, c.nome, d.descricao, d.data FROM despesas d 
+    JOIN categorias c ON d.categoria_id = c.id 
+    ORDER BY d.valor ASC LIMIT 1
+    """
+    resultado = fetch(sql)
+    if not resultado:
+        return "Ainda não tens despesas registadas."
+    v,cat,desc,data = resultado[0]
+    return f"O teu menor gasto foi '{desc}' - {float(v):.2f}€ em {cat} ({data})."
