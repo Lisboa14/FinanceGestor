@@ -152,3 +152,17 @@ def _menor_gasto()->str:
         return "Ainda não tens despesas registadas."
     v,cat,desc,data = resultado[0]
     return f"O teu menor gasto foi '{desc}' - {float(v):.2f}€ em {cat} ({data})."
+
+def _orcamento_estado()-> str:
+    restante = orcamento_dashboard()
+    if restante is None:
+        return "Não tens orçamento definido para este mês. Usa a opção [4] do teu menu."
+    restante = float(restante)
+    gasto = float(total_despesas() or 0)
+    orcamento_val = gasto + restante
+    estado = "dentro" if restante >= 0 else "Fora"
+    emoji = "✅" if restante >= 0 else "❌"
+    return (
+        f"{emoji} Estás {estado} do orçamento.\n"
+            f"Orçamento: {orcamento_val:.2f}€ | Gasto: {gasto:.2f}€ | Dispobível: {restante:.2f}€"
+    )
