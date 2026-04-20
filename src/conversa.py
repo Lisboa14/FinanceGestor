@@ -101,4 +101,11 @@ INTENCOES = (
         r"comandos",
     ],
 )
-    
+def _total_mes_atual() -> str:
+    mes=datetime.datetime.now().strftime("%Y-%m")
+    sql = """
+    SELECT SUM(valor) FROM despesas
+    WHERE DATE_FORMAT(data,'%Y-%m') = %s 
+    """
+    total = fetch(sql, (mes,))[0][0] or 0
+    return f"Gastaste {float(total:.2f}€ este mês ({mes})."
