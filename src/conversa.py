@@ -166,3 +166,22 @@ def _orcamento_estado()-> str:
         f"{emoji} Estás {estado} do orçamento.\n"
             f"Orçamento: {orcamento_val:.2f}€ | Gasto: {gasto:.2f}€ | Dispobível: {restante:.2f}€"
     )
+
+def _media_categoria(match) -> str:
+    grupos=[g for g in match.groups() if g and len(g)>2]
+    if not grupos:
+        return "Não percebi a categoria. Tenta: 'média em alimentação?'"
+    categoria = grupos[-1]
+
+    sql = """
+    SELECT AVG(d.valor), c.nome FROM despesas despesas
+    JOIN categorias c ON d.categoria_id = c.id 
+    WHERE LOWER(c.nome) LIKE %s 
+    GROUP BY c.nome
+    LIMIT 1
+    """
+    resultado = fetch(sql,(f"%{categoria}%",))
+    if not resultado:
+        return f"Não encontrei gastos na categoria '{categoria}'."
+    media, nome = resultado[0]
+    return f"A tua média de gastos em {nome} é {float(media):.2f}€ por despesa."
