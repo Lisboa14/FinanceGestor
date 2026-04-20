@@ -4,38 +4,69 @@ import datetime
 #FILE = "../data/despesas.csv"
 #FILECATEGORIAS = "../data/categorias.txt"
 
+KEYWORDS_PADRAO = {
+    # Alimentação
+    "continente": "Alimentação", "pingo doce": "Alimentação", "lidl": "Alimentação",
+    "aldi": "Alimentação", "mercadona": "Alimentação", "minipreço": "Alimentação",
+    "intermarché": "Alimentação", "supermercado": "Alimentação", "mercearia": "Alimentação",
+    "padaria": "Alimentação", "talho": "Alimentação", "feira": "Alimentação",
+ 
+    # Restaurantes
+    "restaurante": "Restaurantes", "café": "Restaurantes", "mcdonald": "Restaurantes",
+    "kfc": "Restaurantes", "burger king": "Restaurantes", "pizza": "Restaurantes",
+    "sushi": "Restaurantes", "tasca": "Restaurantes", "snack": "Restaurantes",
+    "almoço": "Restaurantes", "jantar": "Restaurantes", "takeaway": "Restaurantes",
+ 
+    # Transportes
+    "gasolina": "Transportes", "combustível": "Transportes", "uber": "Transportes",
+    "bolt": "Transportes", "táxi": "Transportes", "autocarro": "Transportes",
+    "metro": "Transportes", "comboio": "Transportes",
+    "portagem": "Transportes", "via verde": "Transportes", "estacionamento": "Transportes",
+ 
+    # Saúde
+    "farmácia": "Saúde", "médico": "Saúde", "consulta": "Saúde", "dentista": "Saúde",
+    "hospital": "Saúde", "clínica": "Saúde", "análises": "Saúde", "exame": "Saúde",
+    "medicamento": "Saúde", "óculos": "Saúde",
+ 
+    # Subscrições
+    "netflix": "Subscrições", "spotify": "Subscrições", "youtube": "Subscrições",
+    "amazon prime": "Subscrições", "hbo": "Subscrições", "disney": "Subscrições",
+    "apple": "Subscrições", "adobe": "Subscrições", "microsoft": "Subscrições","dazn": "Subscrições",
+ 
+    # Telecomunicações
+    "nos": "Telecomunicações", "meo": "Telecomunicações", "vodafone": "Telecomunicações",
+    "nowo": "Telecomunicações", "internet": "Telecomunicações", "telemóvel": "Telecomunicações",
+ 
+    # Habitação
+    "renda": "Habitação", "condomínio": "Habitação", "água": "Habitação",
+    "luz": "Habitação", "gás": "Habitação", "eletricidade": "Habitação",
+    "edp": "Habitação", "endesa": "Habitação",
+ 
+    # Lazer
+    "cinema": "Lazer", "teatro": "Lazer", "concerto": "Lazer", "museu": "Lazer",
+    "ginásio": "Lazer", "gym": "Lazer", "viagem": "Lazer", "hotel": "Lazer",
+    "airbnb": "Lazer", "bilhete": "Lazer", "jogo": "Lazer",
+ 
+    # roupa
+    "zara": "roupa", "pull&bear": "roupa", "roupa": "roupa", "sapatos": "roupa",
+    "decathlon": "roupa",
+ 
+    # Educação
+    "escola": "Educação", "universidade": "Educação", "curso": "Educação",
+    "livro": "Educação", "propinas": "Educação", "explicação": "Educação",
+    "material escolar": "Educação",
+}
 def add_despesa():
+    criar_tabela_keywords()
     montante = float(input("Valor (€): "))
     
-    categorias= carregar_categorias()
-    print("\n Categorias disponiveis:")
-    for categoria in categorias:
-        print(f"->{categoria}")
-    while True:
-        categoriaEscolhida = input("Escolha uma categoria:")
-        if categoriaEscolhida in categorias:
-            sql = "SELECT id FROM categorias WHERE nome=%s"
-            categoria_id = fetch(sql,(categoriaEscolhida,))[0][0]
-            break
-        else:
-            print("Categoria inválida!!!")
-        
-            opcao=input("Deseja criar uma nova categoria? (s/n)")
+    descricao = input("Descrição: ").strip()
+    
+    categoria_id = escolher_categoria(descricao)
+    if categoria_id is None:
+        return 
 
-            if opcao == "s":
-                execute("INSERT INTO categorias (nome) VALUES (%s)", (categoriaEscolhida,))
-                print("Categoria Adicionada com sucesso!!!")
-                categoria_id = fetch("SELECT id FROM categorias WHERE nome=%s", (categoriaEscolhida,))[0][0]
-                break
-            elif opcao== "n":
-                print("Volta para o menu principal")
-                return
-            else:
-                print("opcao inválida")
-
-    descricao = input("Descrição: ")
     data =datetime.datetime.now().strftime("%Y-%m-%d")
-   
     sql = "INSERT INTO despesas (data,categoria_id, descricao, valor) VALUES (%s,%s,%s,%s)"
     execute(sql,(data, categoria_id, descricao, montante))
     print("Despesa adicionada com sucesso!!!")
@@ -118,4 +149,91 @@ def ver_despesas_data():
     else:
         for d in despesas:
             print(f"Despesa: {d[0]:.2f}€ | Categoria: {d[1]} | Descrição: {d[2]} | Data: {d[3]}")
+
+    
+def criar_tabela_keywords():
+    sql = """
+    CREATE TABLE IF NOT EXISTS palavra_chave(
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        palavra VARCHAR(100) UNIQUE NOT NULL,
+        categoria_id INT NOT NULL,
+        FOREIGN KEY (categoria_id) REFERENCES categorias(id)
+        )
+    """
+    execute(sql)
+    
+def sugerir_categoria(descricao: str) -> str | None:
+    descricao_lower = descricao.lower()
+
+    sql = """
+    SELECT c.nome FROM palavra_chave pk
+    JOIN categorias c ON pk.categoria_id = c.id 
+    WHERE %s LIKE CONCAT('%%', pk.palavra, '%%')
+    ORDER BY LENGTH(pk.palavra) DESC 
+    LIMIT 1
+    """
+    resultado = fetch(sql, (descricao_lower,))
+    if resultado:
+        return resultado[0][0]
+    
+    for keyword, categoria in KEYWORDS_PADRAO.items():
+        if keyword in descricao_lower:
+            return categoria
+    return None
+
+def aprender_keyword(descricao: str, categoria_id: int):
+    palavra = descricao.lower().strip()[:100]
+    if not palavra:
+        return
+    sql = """
+    INSERT INTO palavra_chave (palavra, categoria_id)
+    VALUES (%s, %s)
+    ON DUPLICATE KEY UPDATE categoria_id = %s 
+    """
+    execute(sql,(palavra,categoria_id,categoria_id))
+
+def escolher_categoria(descricao: str) ->int | None:
+    categorias = carregar_categorias()
+    sugestao = sugerir_categoria(descricao)
+
+    if sugestao and sugestao in categorias:
+        print(f"\n 🪄 Sugestão automática: [{sugestao}]")
+        aceitar = input("Aceitar? (Enter para confirmar, 'n' para escolher outra): ").strip().lower()
+        
+        if aceitar != "n":
+            sql = "SELECT id FROM categorias WHERE nome=%s"
+            categoria_id = fetch(sql, (sugestao,))[0][0]
+            aprender_keyword(descricao, categoria_id)
+            return categoria_id
+
+    print("\n Cateorias disponiveis: ")
+    for categoria in categorias:
+        marcador = "+" if categoria == sugestao else "->"
+        print(f" {marcador} {categoria}")
+    
+    while True:
+        categoriaEscolhida = input("\n Escolha uma categoria: ").strip()
+
+        if categoriaEscolhida in categorias:
+            sql = "SELECT id FROM categorias WHERE nome=%s"
+            categoria_id = fetch(sql, (categoriaEscolhida,))[0][0]
+
+            aprender_keyword(descricao, categoria_id)
+            return categoria_id
+        
+        print("Categoria inválida")
+        opcao = input("  Deseja criar uma nova categoria? (s/n): ").strip().lower()
+ 
+        if opcao == "s":
+            execute("INSERT INTO categorias (nome) VALUES (%s)", (categoriaEscolhida,))
+            print("  Categoria criada com sucesso!")
+            categoria_id = fetch("SELECT id FROM categorias WHERE nome=%s", (categoriaEscolhida,))[0][0]
+            aprender_keyword(descricao, categoria_id)
+            return categoria_id
+        elif opcao == "n":
+            print("  A voltar ao menu principal...")
+            return None
+        else:
+            print("  Opção inválida.")
+    
 
