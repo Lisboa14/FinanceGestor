@@ -3,6 +3,8 @@ from db import fetch, execute
 import datetime 
 #FILE = "../data/despesas.csv"
 #FILECATEGORIAS = "../data/categorias.txt"
+import re 
+import unicodedata
 
 KEYWORDS_PADRAO = {
     # Alimentação
@@ -12,7 +14,7 @@ KEYWORDS_PADRAO = {
     "padaria": "Alimentação", "talho": "Alimentação", "feira": "Alimentação",
  
     # Restaurantes
-    "restaurante": "Restaurantes", "café": "Restaurantes", "mcdonald": "Restaurantes",
+    "restaurante": "Restaurantes", "café": "Restaurantes", "mcdonalds": "Restaurantes",
     "kfc": "Restaurantes", "burger king": "Restaurantes", "pizza": "Restaurantes",
     "sushi": "Restaurantes", "tasca": "Restaurantes", "snack": "Restaurantes",
     "almoço": "Restaurantes", "jantar": "Restaurantes", "takeaway": "Restaurantes",
@@ -56,6 +58,15 @@ KEYWORDS_PADRAO = {
     "livro": "Educação", "propinas": "Educação", "explicação": "Educação",
     "material escolar": "Educação",
 }
+def normalizar(texto : str) -> str:
+    texto = texto.lower()
+
+    texto = unicodedata.normalize("NFD", texto)
+    texto ="".join(c for c in texto if unicodedata.category(c) != "Mn")
+    texto = re.sub(r"[^\w\s]", "", texto)
+
+    return texto 
+
 def add_despesa():
     criar_tabela_keywords()
     montante = float(input("Valor (€): "))
@@ -163,7 +174,7 @@ def criar_tabela_keywords():
     execute(sql)
     
 def sugerir_categoria(descricao: str) -> str | None:
-    descricao_lower = descricao.lower()
+    descricao_lower = normalizar(descricao)
 
     sql = """
     SELECT c.nome FROM palavra_chave pk
@@ -177,7 +188,8 @@ def sugerir_categoria(descricao: str) -> str | None:
         return resultado[0][0]
     
     for keyword, categoria in KEYWORDS_PADRAO.items():
-        if keyword in descricao_lower:
+        keyword_norm = normalizar(keyword)
+        if keyword_norm in descricao_lower:
             return categoria
     return None
 
@@ -208,7 +220,7 @@ def escolher_categoria(descricao: str) ->int | None:
 
     print("\n Cateorias disponiveis: ")
     for categoria in categorias:
-        marcador = "+" if categoria == sugestao else "->"
+        marcador = "🪄 " if categoria == sugestao else "->"
         print(f" {marcador} {categoria}")
     
     while True:
