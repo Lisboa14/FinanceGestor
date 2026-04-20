@@ -109,3 +109,25 @@ def _total_mes_atual() -> str:
     """
     total = fetch(sql, (mes,))[0][0] or 0
     return f"Gastaste {float(total:.2f}€ este mês ({mes})."
+
+def _total_categoria(texto_original:str, match)->str:
+    grupos = [g for in match.groups() if g and len(g)>2]
+    if not grupos:
+        return "Não percebi a categoria. Tenta: 'quanto gastei em alimentação?'"
+    categoria = grupos[-1]
+    
+    sql = """
+    SELECT SUM(d.valor), c.nome FROM despesas d 
+    JOIN categorias c ON d.categoria_id = c.id 
+    WHERE LOWER(c.nome) LIKE %s 
+    LIMIT 1
+    """
+
+    resultado = fetch(sql,(f"%{categoria}%",))
+    if not resultado:
+        return f"Não encontrei gastos na categoria '{categoria}'."
+    total, nome = resultado[0]
+    return f"Gastaste {float(total):.2f}€ em {nome}."
+
+
+
