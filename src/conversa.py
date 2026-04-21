@@ -254,3 +254,19 @@ def _poupancas_atuais()->str:
     if not resultado:
         return "Ainda não há registos de poupancas para este mês."
     return f"As tuas poupancas acumuladas até este mês são {float(resultado[0][0]:.2f}€."
+
+def _ajuda()->str:
+    return (
+        "Podes perguntar-me coisas como:\n"
+        " *'quanto gastei este mês?'\n"
+        " *'quanto gastei em alimentação?'\n"
+        " *'qual foi o maior gasto?'\n"
+        " *'estou dentro do orçamento?'\n"
+        " *'média em transportes'\n"
+        " *'qual o mês mais caro?'\n"
+        " *'onde gasto mais?'\n"
+        " *'quantas despesas tenho?'\n"
+        " *'último gasto'\n"
+        " *'total do ano'\n"
+        " *'quanto poupei?'"
+    )
