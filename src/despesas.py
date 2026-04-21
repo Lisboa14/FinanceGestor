@@ -274,3 +274,53 @@ def remover_despesa():
     execute("DELETE FROM despesas WHERE id = %s",(id_despesa,))
     print("Despesa removida com sucesso!!!")
 
+def editar_despesa():
+    sql = """
+    SELECT d.id, d.valor, c.nome, d.descricao, d.data 
+    FROM despesas d 
+    JOIN categorias c ON d.categoria_id = c.id 
+    """
+
+    despesas = fetch(sql)
+
+    if not despesas:
+        print("Não há despesas para editar.")
+        return 
+    
+    print("\nLista de despesas\n")
+    for d in despesas:
+        print(f"[{d[0]}] {d[1]:.2f} | {d[2]} | {d[3]} | {d[4]}")
+    try:
+        id_despesa = int(input("\nID da despesa a editar: "))
+    except:
+        print("ID inválido")
+        return 
+
+    sql = """
+    SELECT valor, categoria_id, descricao, data 
+    FROM despesas WHERE id = %s 
+    """
+    resultado = fetch(sql, (id_despesa,))
+    if not resultado:
+        print("Despesa não encontrada")
+        return
+    valor, categoria_id, descricao, data = resultado[0]
+
+    print ("\nPressiona ENTER para manter o valor atual.\n")
+
+    novo_valor = input(f"Valor ({valor}€): ")
+    nova_desc = input(f"Descricao ({descricao}): ")
+
+    novo_valor = float(novo_valor) if novo_valor else valor 
+    nova_desc = nova_desc if nova_desc else descricao
+
+    nova_categoria = categoria_id
+
+    sql = """
+    UPDATE despesas
+    SET valor = %s, descricao = %s, categoria_id = %s 
+    WHERE id = %s 
+    """
+
+    execute(sql,(novo_valor, nova_desc, nova_categoria, id_despesa))
+    print("Despesa atualizada com sucesso!!!")

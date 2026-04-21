@@ -14,7 +14,7 @@ from rich.padding import Padding
 # ─── importa os teus módulos ───────────────────────────────────────────────
 from despesas import (
     add_despesa, ver_despesas, total_despesas,
-    ver_despesas_categoria, ver_despesas_mes, ver_despesas_data, remover_despesa,
+    ver_despesas_categoria, ver_despesas_mes, ver_despesas_data, remover_despesa, editar_despesa,
 )
 from graficos import grafico_categorias
 from orcamento import definir_orcamento, ver_orcamento, orcamento_dashboard
@@ -156,6 +156,7 @@ def menu_ver_despesas():
             ("3", "Por mês"),
             ("4", "Por data específica"),
             ("5", "Remover despesa"),
+            ("6", "Editar despesa"),
             ("0", "← Voltar"),
         ])
 
@@ -172,6 +173,8 @@ def menu_ver_despesas():
             ver_despesas_data()
         elif escolha == "5":
             remover_despesa()
+        elif escolha == "6":
+            editar_despesa()
         elif escolha == "0":
             break
         else:
