@@ -216,3 +216,12 @@ def _categoria_mais_cara()->str:
     nome,total = resultado[0]
     return f"A categoria onde gastas mais é '{nome}' com {float(total):.2f}€ no total."
 
+def _num_despesas()->str:
+    mes = datetime.datetime.now().strftime("%Y-%m")
+    sql_mes="SELECT COUNT(*) FROM despesas WHERE DATE_FORMAT(data, '%Y-%m') = %s"
+    sql_total="SELECT COUNT(*) FROM despesas"
+    n_mes = fetch(sql_mes, (mes,))[0][0]
+    n_total = fetch(sql_total)[0][0]
+    return f"Tens {n_mes} despesas este mês e {n_total} despesas no total."
+
+
