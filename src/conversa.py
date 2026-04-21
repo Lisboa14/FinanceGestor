@@ -270,3 +270,48 @@ def _ajuda()->str:
         " *'total do ano'\n"
         " *'quanto poupei?'"
     )
+
+def interpertar(pergunta: str) ->str:
+    texto = normalizar(pergunta)
+
+    for inencao, padroes in INTENCOES.items():
+        for padrao in padroes:
+            match = re.searh(padrao,texto)
+            if match:
+                try:
+                    return _executar(inencao, match,pergunta)
+                execpt Exception as e:
+                    return f"Ocorreu um erro ao processao: {e}"
+    return(
+        "Não percebi a pergunta.\n"
+        "Escreve 'ajuda' para ver exemplos do que podes perguntar."
+    )
+
+def _executar(intencao: str, match, texto_original: str) -> str:
+    if intencao == "total_mes_atual":
+        return _total_mes_atual()
+    elif intencao == "total_categoria":
+        return _total_categoria(texto_original, match)
+    elif intencao == "maior_gasto":
+        return _maior_gasto()
+    elif intencao == "menor_gasto":
+        return _menor_gasto()
+    elif intencao == "orcamento_estado":
+        return _orcamento_estado()
+    elif intencao == "media_categoria":
+        return _media_categoria(match)
+    elif intencao == "mes_mais_caro":
+        return _mes_mais_caro()
+    elif intencao == "categoria_mais_cara":
+        return _categoria_mais_cara()
+    elif intencao == "num_despesas":
+        return _num_despesas()
+    elif intencao == "ultimo_gasto":
+        return _ultimo_gasto()
+    elif intencao == "total_ano":
+        return _total_ano()
+    elif intencao == "poupcancas_atuais":
+        return _poupancas_atuais()
+    elif intencao == "ajuda":
+        return _ajuda()
+    return "Não sei responder a isso ainda."
