@@ -245,4 +245,12 @@ def _total_ano()->str:
     WHERE YEAR(data) = %s 
     """
     total = fetch(sql, (ano,))[0][0] or 0 
-    return f"Gastaste {float(total):.2f}€ em {ano} no total"
+    return f"Gastaste {float(total):.2f}€ em {ano} no total."
+
+def _poupancas_atuais()->str:
+    mes = datetime.datetime.now().strftime("%Y-%m")
+    sql = "SELECT valor FROM poupancas WHERE mes = %s"
+    resultado = fetch(sql)
+    if not resultado:
+        return "Ainda não há registos de poupancas para este mês."
+    return f"As tuas poupancas acumuladas até este mês são {float(resultado[0][0]:.2f}€."
