@@ -1,5 +1,24 @@
-__pycache__/
-*.pyc
 data/despesas.csv
 data/categorias.txt
-data/*.db
+# Ambiente
+.env
+.env.local
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Base de dados
+*.sql
+*.db
+*.sqlite3
+# macOS
+.DS_Store
