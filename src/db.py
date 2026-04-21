@@ -1,14 +1,18 @@
 import mysql.connector
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
 def get_connection():
-    conn=mysql.connector.connect(
-        host="127.0.0.1",
-        port=8889,
-        user="root",
-        password="root",
-        database="financegestor"
+    conn = mysql.connector.connect(
+        host=os.getenv("DB_HOST"),
+        port=int(os.getenv("DB_PORT")),
+        user=os.getenv("DB_USER"),
+        password=os.getenv("DB_PASSWORD"),
+        database=os.getenv("DB_NAME")
     )
-    return conn
+    return conn 
+
 def fetch(query, params=None):
     conn = get_connection()
     cursor = conn.cursor()
