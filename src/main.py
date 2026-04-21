@@ -16,7 +16,7 @@ from despesas import (
     add_despesa, ver_despesas, total_despesas,
     ver_despesas_categoria, ver_despesas_mes, ver_despesas_data, remover_despesa, editar_despesa,
 )
-from graficos import grafico_categorias
+from graficos import grafico_categorias, grafico_intervalo
 from orcamento import definir_orcamento, ver_orcamento, orcamento_dashboard
 from poupancas import poupancas
 from conversa import interpretar
@@ -137,7 +137,7 @@ def menu_principal():
     _render_menu("Menu Principal", [
         ("1", "Adicionar despesa"),
         ("2", "Ver despesas"),
-        ("3", "Gráficos por categoria"),
+        ("3", "Gráficos"),
         ("4", "Definir orçamento"),
         ("5", "Ver orçamento mensal"),
         ("6", "Modo Conversa"),
@@ -183,6 +183,34 @@ def menu_ver_despesas():
         if escolha in ("1", "2", "3", "4"):
             console.print()
             Prompt.ask(f"  [{DIM}]prima Enter para continuar[/]", default="", console=console)
+
+def menu_ver_graficos():
+    while True:
+        limpar_terminal()
+        header()
+
+        _render_menu("ver despesas", [
+            ("1", "Por categoria"),
+            ("2", "Intervalo"),
+            ("0", "← Voltar"),
+        ])
+
+        escolha = Prompt.ask(f"  [{ACCENT}]›[/] escolha", console=console)
+        limpar_terminal()
+
+        if escolha == "1":
+            grafico_categorias()
+        elif escolha == "2":
+            grafico_intervalo()
+        elif escolha == "0":
+            break
+        else:
+            console.print(f"\n  [{DANGER}]✗ Opção inválida.[/]\n")
+
+        if escolha in ("1", "2"):
+            console.print()
+            Prompt.ask(f"  [{DIM}]prima Enter para continuar[/]", default="", console=console)
+
 
 def modo_conversa():
     limpar_terminal()
@@ -275,11 +303,7 @@ def main():
             menu_ver_despesas()
 
         elif escolha == "3":
-            header()
-            console.print(Rule(f"[{DIM}]gráficos por categoria[/]", style=DIM))
-            console.print()
-            grafico_categorias()
-            _aguardar()
+            menu_ver_graficos()
 
         elif escolha == "4":
             header()
