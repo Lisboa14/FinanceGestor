@@ -196,8 +196,23 @@ def _mes_mais_caro()->str:
     """
     
     resultado = fetch(sql)
-    if not resultado
+    if not resultado:
         return "Ainda não tens despesas registadas"
     mes, total = resultado[0]
     return f"O teu mês mais caro foi {mes} com {float(total):.2f}€ gastos."
+
+def _categoria_mais_cara()->str:
+    sql = """
+    SELECT c.nome, SUM(d.valor) as total FROM despesas d 
+    JOIN categorias c ON d.categoria_id = c.id 
+    GROUP BY c.nome 
+    ORDER BY total DESC
+    LIMIT 1
+    """
+
+    resultado = fetch(sql)
+    if not resultado:
+        return "Ainda não tens despesas registadas"
+    nome,total = resultado[0]
+    return f"A categoria onde gastas mais é '{nome}' com {float(total):.2f}€ no total."
 
