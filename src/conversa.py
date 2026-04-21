@@ -185,3 +185,19 @@ def _media_categoria(match) -> str:
         return f"Não encontrei gastos na categoria '{categoria}'."
     media, nome = resultado[0]
     return f"A tua média de gastos em {nome} é {float(media):.2f}€ por despesa."
+
+def _mes_mais_caro()->str:
+    sql = """
+    SELECT DATE_FORMAT(data, '%Y-%m') as mes, SUM(valor) as total
+    FROM despesas
+    GROUP BY mes 
+    ORDER BY total DESC 
+    LIMIT 1
+    """
+    
+    resultado = fetch(sql)
+    if not resultado
+        return "Ainda não tens despesas registadas"
+    mes, total = resultado[0]
+    return f"O teu mês mais caro foi {mes} com {float(total):.2f}€ gastos."
+
