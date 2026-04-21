@@ -238,3 +238,11 @@ def _ultimo_gasto()->str:
     v,cat,desc,data = resultado[0]
     return f"O teu último gasto foi '{desc}' - {float(v):.2f}€ em {cat} ({data})."
 
+def _total_ano()->str:
+    ano= datetime.datetime.now().year 
+    sql = """
+    SELECT SUM(valor) FROM despesas
+    WHERE YEAR(data) = %s 
+    """
+    total = fetch(sql, (ano,))[0][0] or 0 
+    return f"Gastaste {float(total):.2f}€ em {ano} no total"
