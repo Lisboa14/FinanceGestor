@@ -224,4 +224,17 @@ def _num_despesas()->str:
     n_total = fetch(sql_total)[0][0]
     return f"Tens {n_mes} despesas este mês e {n_total} despesas no total."
 
+def _ultimo_gasto()->str:
+    sql = """
+    SELECT d.valor, c.nome, d.descricao, d.data FROM despesas d 
+    JOIN categorias c ON d.categoria_id=c.id 
+    ORDER BY d.data DESC, d.id DESC
+    LIMIT 1
+    """
+
+    resultado = fetch(sql)
+    if not resultado:
+        return"Ainda não tens despesas registadas"
+    v,cat,desc,data = resultado[0]
+    return f"O teu último gasto foi '{desc}' - {float(v):.2f}€ em {cat} ({data})."
 
