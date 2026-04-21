@@ -314,7 +314,18 @@ def editar_despesa():
     novo_valor = float(novo_valor) if novo_valor else valor 
     nova_desc = nova_desc if nova_desc else descricao
 
-    nova_categoria = categoria_id
+    nova_categoria_id = categoria_id
+    sugestao = sugerir_categoria(nova_desc)
+    categorias = carregar_categorias()
+    if sugestao and sugestao in categorias:
+        print(f"\n 🪄 Nova sugestão automática: [{sugestao}]")
+        aceitar = input("Aceitar nova categoria? (ENTER para sim , 'n' para manter atual): ").strip().lower()
+
+        if aceitar != "n":
+            sql ="SELECT id FROM categorias WHERE nome=%s"
+            nova_categoria_id = fetch(sql, (sugestao,))[0][0]
+    else:
+        print("\n Sem sugestão nova (matendo categoria atual)")
 
     sql = """
     UPDATE despesas
@@ -322,5 +333,5 @@ def editar_despesa():
     WHERE id = %s 
     """
 
-    execute(sql,(novo_valor, nova_desc, nova_categoria, id_despesa))
+    execute(sql,(novo_valor, nova_desc, nova_categoria_id, id_despesa))
     print("Despesa atualizada com sucesso!!!")
