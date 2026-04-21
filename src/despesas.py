@@ -247,5 +247,30 @@ def escolher_categoria(descricao: str) ->int | None:
             return None
         else:
             print("  Opção inválida.")
-    
+def remover_despesa():
+    sql = """
+    SELECT d.id,d.valor,c.nome,d.descricao,d.data
+    FROM despesas d 
+    JOIN categorias c ON d.categoria_id = c.id 
+    """
+
+    despesas = fetch(sql)
+
+    if not despesas:
+        print("Não há despesas para remover")
+        return 
+    print("\nLista de despesas\n")
+    for d in despesas:
+        print(f"[{d[0]}] {d[1]:.2f} | {d[2]} | {d[3]} | {d[4]}")
+    try:
+        id_despesa = int(input("\nID da despesa a remover: "))
+    except:
+        print("ID inválido")
+        return 
+    confirmar = input("Tens certeza que queres remover? (s/n): ").lower()
+    if confirmar != "s":
+        print("Cancelado.")
+        return
+    execute("DELETE FROM despesas WHERE id = %s",(id_despesa,))
+    print("Despesa removida com sucesso!!!")
 
