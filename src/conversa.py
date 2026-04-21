@@ -250,7 +250,7 @@ def _total_ano()->str:
 def _poupancas_atuais()->str:
     mes = datetime.datetime.now().strftime("%Y-%m")
     sql = "SELECT valor FROM poupancas WHERE mes = %s"
-    resultado = fetch(sql)
+    resultado = fetch(sql,(mes,))
     if not resultado:
         return "Ainda não há registos de poupancas para este mês."
     return f"As tuas poupancas acumuladas até este mês são {float(resultado[0][0]):.2f}€."
