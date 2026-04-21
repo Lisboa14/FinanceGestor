@@ -6,16 +6,16 @@ from db import fetch
 from orcamento import orcamento_dashboard
 from despesas import total_despesas
 
-def normalizar(texto: str)-> str:
+def normalizar(texto: str) -> str:
     texto = texto.lower().strip()
-    texto =".join(
-        c for c in unicodedata.normalize('NFC' ,texto)
+    texto = ''.join(
+        c for c in unicodedata.normalize('NFD', texto)
         if unicodedata.category(c) != 'Mn'
     )
-    texto = re.sub(r'[^\w\s]',",texto)
-    return texto 
+    texto = re.sub(r'[^\w\s]', '', texto)
+    return texto
 
-INTENCOES = (
+INTENCOES = {
     "total_mes_atual":[
         r"quanto gastei (este mes|este|no mes|no mes atual)",
         r"total (do|deste|no) mes",
@@ -100,7 +100,7 @@ INTENCOES = (
         r"exemplos",
         r"comandos",
     ],
-)
+}
 def _total_mes_atual() -> str:
     mes=datetime.datetime.now().strftime("%Y-%m")
     sql = """
@@ -108,10 +108,10 @@ def _total_mes_atual() -> str:
     WHERE DATE_FORMAT(data,'%Y-%m') = %s 
     """
     total = fetch(sql, (mes,))[0][0] or 0
-    return f"Gastaste {float(total:.2f}€ este mês ({mes})."
+    return f"Gastaste {float(total):.2f}€ este mês ({mes})."
 
 def _total_categoria(texto_original:str, match)->str:
-    grupos = [g for in match.groups() if g and len(g)>2]
+    grupos = [g for g in match.groups() if g and len(g)>2]
     if not grupos:
         return "Não percebi a categoria. Tenta: 'quanto gastei em alimentação?'"
     categoria = grupos[-1]
@@ -174,7 +174,7 @@ def _media_categoria(match) -> str:
     categoria = grupos[-1]
 
     sql = """
-    SELECT AVG(d.valor), c.nome FROM despesas despesas
+    SELECT AVG(d.valor), c.nome FROM despesas d
     JOIN categorias c ON d.categoria_id = c.id 
     WHERE LOWER(c.nome) LIKE %s 
     GROUP BY c.nome
@@ -253,7 +253,7 @@ def _poupancas_atuais()->str:
     resultado = fetch(sql)
     if not resultado:
         return "Ainda não há registos de poupancas para este mês."
-    return f"As tuas poupancas acumuladas até este mês são {float(resultado[0][0]:.2f}€."
+    return f"As tuas poupancas acumuladas até este mês são {float(resultado[0][0]):.2f}€."
 
 def _ajuda()->str:
     return (
@@ -271,16 +271,16 @@ def _ajuda()->str:
         " *'quanto poupei?'"
     )
 
-def interpertar(pergunta: str) ->str:
+def interpretar(pergunta: str) ->str:
     texto = normalizar(pergunta)
 
-    for inencao, padroes in INTENCOES.items():
+    for intencao, padroes in INTENCOES.items():
         for padrao in padroes:
-            match = re.searh(padrao,texto)
+            match = re.search(padrao,texto)
             if match:
                 try:
-                    return _executar(inencao, match,pergunta)
-                execpt Exception as e:
+                    return _executar(intencao, match,pergunta)
+                except Exception as e:
                     return f"Ocorreu um erro ao processao: {e}"
     return(
         "Não percebi a pergunta.\n"
@@ -310,7 +310,7 @@ def _executar(intencao: str, match, texto_original: str) -> str:
         return _ultimo_gasto()
     elif intencao == "total_ano":
         return _total_ano()
-    elif intencao == "poupcancas_atuais":
+    elif intencao == "poupancas_atuais":
         return _poupancas_atuais()
     elif intencao == "ajuda":
         return _ajuda()

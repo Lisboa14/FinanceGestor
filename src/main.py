@@ -19,6 +19,7 @@ from despesas import (
 from graficos import grafico_categorias
 from orcamento import definir_orcamento, ver_orcamento, orcamento_dashboard
 from poupancas import poupancas
+from conversa import interpretar
 # ──────────────────────────────────────────────────────────────────────────
 console = Console()
 
@@ -139,6 +140,7 @@ def menu_principal():
         ("3", "Gráficos por categoria"),
         ("4", "Definir orçamento"),
         ("5", "Ver orçamento mensal"),
+        ("6", "Modo Conversa"),
         ("0", "Sair"),
     ])
 
@@ -176,7 +178,69 @@ def menu_ver_despesas():
             console.print()
             Prompt.ask(f"  [{DIM}]prima Enter para continuar[/]", default="", console=console)
 
+def modo_conversa():
+    limpar_terminal()
+    header()
+    console.print(Rule(f"[{DIM}]modo conversa[/]", style=DIM))
+    console.print()
 
+    # Dica inicial
+    dica = Text()
+    dica.append("  💬 ", style=f"bold {ACCENT}")
+    dica.append("Faz-me perguntas em português sobre as tuas finanças.\n", style=TEXT)
+    dica.append("     Escreve ", style=f"dim {DIM}")
+    dica.append("'ajuda'", style=f"bold {ACCENT}")
+    dica.append(" para ver exemplos  |  ", style=f"dim {DIM}")
+    dica.append("'sair'", style=f"bold {DANGER}")
+    dica.append(" para voltar ao menu.", style=f"dim {DIM}")
+    console.print(Padding(dica, (0, 2)))
+    console.print()
+
+    historico = []  # guarda as últimas interações para contexto visual
+
+    while True:
+        try:
+            pergunta = Prompt.ask(
+                f"  [{ACCENT}]›[/]",
+                console=console
+            ).strip()
+        except (KeyboardInterrupt, EOFError):
+            break
+
+        if not pergunta:
+            continue
+
+        if pergunta.lower() in ("sair", "voltar", "exit", "quit"):
+            break
+
+        # Processa e mostra resposta
+        resposta = interpretar(pergunta)
+
+        console.print()
+
+        # Pergunta em cinzento
+        console.print(Padding(
+            Text(f"  {pergunta}", style=f"dim {DIM}"),
+            (0, 2)
+        ))
+
+        # Resposta em painel estilizado
+        resp_text = Text()
+        for linha in resposta.split("\n"):
+            resp_text.append(f"{linha}\n", style=TEXT)
+
+        console.print(Padding(
+            Panel(
+                resp_text,
+                border_style=ACCENT,
+                box=box.ROUNDED,
+                padding=(0, 2),
+            ),
+            (0, 4)
+        ))
+        console.print()
+
+        historico.append((pergunta, resposta))
 # ─── LOOP PRINCIPAL ───────────────────────────────────────────────────────
 
 def _aguardar():
@@ -224,7 +288,8 @@ def main():
             console.print()
             ver_orcamento()
             _aguardar()
-
+        elif escolha == "6":
+            modo_conversa()
         elif escolha == "0":
             limpar_terminal()
             msg = Text()
