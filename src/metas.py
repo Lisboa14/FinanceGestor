@@ -179,3 +179,20 @@ def _verificar_concluidas(poupancas: float):
                 (hoje,id_)
             )
             print(f"\n 🏆 Meta atingida automaticamente: '{nome}' - {float(valor_alvo):.2f}€!!!")
+
+def verificar_metas_risco()->list[str]:
+    avisos = []
+    metas = fetch("SELECT id, nome, valor_alvo, prazo FROM metas WHERE concluida = 0 AND prazo IS NOT NULL")
+    poupancas = _poupancas_atuais()
+    media = _media_poupancas_mensal()
+
+    for id_,nome,valor_alvo,prazo in metas:
+        valor_alvo = float(valor_alvo)
+        falta  max(0.0,valor_alvo- poupancas)
+        if falta<=0:
+            continue
+        meses_rest =_meses_ate(str(prazo))
+        por_mes = falta / meses_rest
+        if media <por_mes *0.8:
+            avisos.append(f"Meta '{nome}': precisas {por_mes:.2f}€/mês, poupas {media:.2f}€/mês")
+    return avisos
