@@ -73,7 +73,7 @@ def criar_meta():
             if media >= por_mes:
                 print(f"Ritmo atual ({media:.2f}€/mês) é suficiente ✅")
             else:
-                print(f"Ritmo atual ({media:.2f}€/mês) - precisas de +{por_mes -media:.2f}€/mês ⚠️")
+                print(f"Ritmo atual ({media:.2f}€) - precisas de +{por_mes -media:.2f}€ ⚠️")
     elif media > 0 and falta > 0:
         meses_proj = falta / media 
         print(f"Ao ritmo ({media:.2f}, atinges em ~{meses_proj:.0f} meses)")
@@ -132,7 +132,7 @@ def _mostrar_meta(meta, poupancas: float, media:float, hoje:datetime.date):
                     meses_proj = falta / media
                     print(f"Projeção:atinges em ~{meses_proj:.0f} meses ✅ (precisas {por_mes:.2f}€/mês")
                 else:
-                    print(f"⚠️ Risco:precisas {por_mes:.2f}€/mês, poupas {media:.2f}€/mês (+{por_mes -media:.2f}€ em falta)")
+                    print(f"⚠️ Risco:precisas {por_mes:.2f}€, tens poupado {media:.2f}€ (+{por_mes -media:.2f}€ em falta)")
             else:
                 print(f"Precisas de poupar {por_mes:.2f}€/mês para chegar a tempo")
         elif falta == 0:
