@@ -144,3 +144,27 @@ def _mostrar_meta(meta, poupancas: float, media:float, hoje:datetime.date):
         elif falta ==0:
             print("✅ Meta atingida!!!")
 
+def concluir_meta():
+    metas = fetch("SELECT id, nome,valor_alovo FROM metas WHERE conluida = 0")
+
+    if not metas:
+        print("\nSem metas ativas.")
+        return
+    
+    print("\nMetas ativas:\n")
+    for m in metas:
+        print(f" [{m[0]}] {m[1]} - {float(m[2]:.2f)}€")
+    
+    try:
+        id_meta = input("\nID da meta a concluir")
+    except ValueError:
+        print("ID inválido.")
+        return 
+    hoje = datetime.date.today().strftime("%Y-%m-%d")
+    execute(
+        "UPDATE metas SET conluida=1, conluida_em=%s WHERE id=%s",
+        (hoje, id_meta)
+    )
+    meta = fetch("SELECT name FROM metas WHERE id=%s", (id_meta))
+    nome = meta[0][0] if meta else "Meta"
+    print(f"\n 🏆 Parabéns!!! Meta '{nome}' concluida!!!")
