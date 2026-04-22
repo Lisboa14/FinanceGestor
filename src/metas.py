@@ -3,7 +3,7 @@ import datetime
 
 def _poupancas_atuais() ->float:
     mes = datetime.datetime.now().strftime("%Y-%m")
-    res = fetch("SELECT valor FrOM poupancas WHERE mes <= %s ORDER BY mes DESC LIMIT 1", (mes,))
+    res = fetch("SELECT valor FROM poupancas WHERE mes <= %s ORDER BY mes DESC LIMIT 1", (mes,))
     return float(res[0][0]) if res else 0.0
 
 def _media_poupancas_mensal()->float:
@@ -23,8 +23,8 @@ def _meses_ate(prazo_str: str)->int:
     return max(1, meses)
 
 def _barra_progresso(pct: float, largura:int = 10) -> str:
-    preenchimento = int(min(pct, 100) / 100 * largura)
-    return "+" * preenchimento + "*" * (largura -preenchimento)
+    preenchido = int(min(pct, 100) / 100 * largura)
+    return "█" * preenchido + "░" * (largura - preenchido)
 
 def criar_meta():
     print("\nNova meta de poupança\n")
@@ -114,7 +114,7 @@ def _mostrar_meta(meta, poupancas: float, media:float, hoje:datetime.date):
     print(f"{barra} {poupancas:.0f}€ / {valor_alvo:.0f}€ ({pct:.0f}%)")
 
     if prazo:
-        prazo_dt = datetime.datetime.strftime(str(prazo), "%Y-%m,-%d").date()
+        prazo_dt = datetime.datetime.strptime(str(prazo), "%Y-%m-%d").date()
         dias_restantes = (prazo_dt - hoje).days 
         meses_rest = _meses_ate(str(prazo))
 
@@ -145,7 +145,7 @@ def _mostrar_meta(meta, poupancas: float, media:float, hoje:datetime.date):
             print("✅ Meta atingida!!!")
 
 def concluir_meta():
-    meta = fetch("SELECT id, nome FROM metas WHERE concluida = 0")
+    metas = fetch("SELECT id, nome,valor_alvo FROM metas WHERE concluida = 0")
     if not metas:
         print("\nSem metas ativas.")
         return
@@ -161,10 +161,10 @@ def concluir_meta():
         return 
     hoje = datetime.date.today().strftime("%Y-%m-%d")
     execute(
-        "UPDATE metas SET conluida=1, conluida_em=%s WHERE id=%s",
+        "UPDATE metas SET concluida=1, concluida_em=%s WHERE id=%s",
         (hoje, id_meta)
     )
-    meta = fetch("SELECT name FROM metas WHERE id=%s", (id_meta))
+    meta = fetch("SELECT nome FROM metas WHERE id=%s", (id_meta,))
     nome = meta[0][0] if meta else "Meta"
     print(f"\n 🏆 Parabéns!!! Meta '{nome}' concluida!!!")
 

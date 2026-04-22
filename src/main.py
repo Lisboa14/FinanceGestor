@@ -117,7 +117,7 @@ def painel_orcamento():
         meta_cards = []
         for m in metas_ativas[:4]:
             barra_cheia = int(m["pct"] / 5)
-            barra = "+" * barra_cheia + "*" * (20 - barra_cheia)
+            barra = "█" * barra_cheia + "░" * (20 - barra_cheia)
             cor   = ACCENT if m["pct"] >= 100 else WARN if m["pct"] >= 60 else TEXT
             t = Text()
             t.append(m["nome"][:18] + "\n",style=f"bold {TEXT}")
