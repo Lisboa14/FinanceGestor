@@ -99,7 +99,7 @@ def ver_metas():
         print("\nMetas Concluídas\n")
         for meta in concluidas:
             id_,nome, valor_alvo, prazo, criada_em, _ = meta
-            print(f"{nome} - {float(valo_alvo):.2f}€ (concluída)")
+            print(f"{nome} - {float(valor_alvo):.2f}€ (concluída)")
 
     _verificar_concluidas(poupancas)
 
@@ -145,7 +145,7 @@ def _mostrar_meta(meta, poupancas: float, media:float, hoje:datetime.date):
             print("✅ Meta atingida!!!")
 
 def concluir_meta():
-    metas = fetch("SELECT id, nome,valor_alovo FROM metas WHERE conluida = 0")
+    metas = fetch("SELECT id, nome,valor_alvo FROM metas WHERE conluida = 0")
 
     if not metas:
         print("\nSem metas ativas.")
@@ -168,3 +168,14 @@ def concluir_meta():
     meta = fetch("SELECT name FROM metas WHERE id=%s", (id_meta))
     nome = meta[0][0] if meta else "Meta"
     print(f"\n 🏆 Parabéns!!! Meta '{nome}' concluida!!!")
+
+def _verificar_concluidas(poupancas: float):
+    metas = fetch("SELECT id, nome, valor_alvo FROM metas WHERE concluida = 0")
+    hoje = datetime.date.today().strftime("%Y-%m-%d")
+    for id_,nome,valor_alvo in metas:
+        if poupancas >= float(valor_alvo):
+            execute(
+                "UPDATE metas SET concluida=1, concluida_em=%s WHERE id_%s"
+                (hoje,id_)
+            )
+            print(f"\n 🏆 Meta atingida automaticamente: '{nome}' - {float(valor_alvo):.2f}€!!!")
