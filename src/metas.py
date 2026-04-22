@@ -78,3 +78,28 @@ def criar_meta():
         meses_proj = falta / media 
         print(f"Ao ritmo ({media:.2f}, atinges em ~{meses_proj:.0f} meses)")
 
+def ver_metas():
+    metas = fetch("SELECT id, nome, valor_alvo, prazo, criada_em, concluida FROM metas ORDER BY concluida, prazo")
+    if not metas:
+        print("\nAinda não tens metas definidas")
+        return 
+    poupancas =_poupancas_atuais()
+    media= _media_poupancas_mensal()
+    hoje = datetime.date.today()
+
+    ativas = [m for m in metas if not m[5]]
+    concluidas = [m for m in metas if m[5]]
+    
+    if ativas:
+        print("\nMetas ativas\n")
+        for meta in ativas:
+            _mostrar_meta(meta, poupancas, media, hoje)
+
+    if concluidas:
+        print("\nMetas Concluídas\n")
+        for meta in concluidas:
+            id_,nome, valor_alvo, prazo, criada_em, _ = meta
+            print(f"{nome} - {float(valo_alvo):.2f}€ (concluída)")
+
+    _verificar_concluidas(poupancas)
+
