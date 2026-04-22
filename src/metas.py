@@ -45,7 +45,7 @@ def criar_meta():
     prazo = None 
     if prazo_str:
         try:
-            datetime.datetime.strftime(prazo_str, "%Y-%m-%d")
+            datetime.datetime.strptime(prazo_str, "%Y-%m-%d")
             prazo = prazo_str 
         except ValueError:
             print("Formato de data inválido. MEta criada sem prazo")
