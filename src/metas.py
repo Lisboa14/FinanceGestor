@@ -1,4 +1,4 @@
-from dm import fetch, execute
+from db import fetch, execute
 import datetime 
 
 def _poupancas_atuais() ->float:
@@ -11,14 +11,14 @@ def _media_poupancas_mensal()->float:
         SELECT AVG(valor) FROM (
             SELECT valor FROM poupancas
             ORDER BY mes DESC LIMIT 3
-        )
+        ) sub 
     """)
 
     return float(res[0][0] or 0)
 
 def _meses_ate(prazo_str: str)->int:
     hoje = datetime.date.today()
-    prazo = datetime.datetime.strftime(str(prazo_str), "%Y-%m-%d").date()
+    prazo = datetime.datetime.strptime(prazo_str, "%Y-%m-%d").date()
     meses = (prazo.year - hoje.year) * 12 + (prazo.month - hoje.month)
     return max(1, meses)
 
@@ -27,7 +27,7 @@ def _barra_progresso(pct: float, largura:int = 10) -> str:
     return "+" * preenchimento + "*" * (largura -preenchimento)
 
 def criar_meta():
-    print("\Nova meta de poupança\n")
+    print("\nNova meta de poupança\n")
 
     nome = input(" Nome da meta: ").strip()
     if not nome:
@@ -41,18 +41,18 @@ def criar_meta():
     except ValueError:
         print("Valor inválido")
         return
-    prazo_str = input("Prazo (YYYY-MM-DD [opcional, ENTER para ignorar]: ").stript()
+    prazo_str = input("Prazo (YYYY-MM-DD [opcional, ENTER para ignorar]: ").strip()
     prazo = None 
     if prazo_str:
         try:
-            datetime.datetime.strftime(prazo_str, "%Y-%m-%m")
+            datetime.datetime.strftime(prazo_str, "%Y-%m-%d")
             prazo = prazo_str 
         except ValueError:
             print("Formato de data inválido. MEta criada sem prazo")
             prazo = None 
     hoje = datetime.date.today().strftime("%Y-%m-%d")
     execute(
-        "INSERT INTO metas (nome,valor_alvo, prazo, criada_em) VALUES (%s, %s, %s, %s",
+        "INSERT INTO metas (nome,valor_alvo, prazo, criada_em) VALUES (%s, %s, %s, %s)",
         (nome, valor_alvo, prazo, hoje)
     )
 
@@ -107,14 +107,14 @@ def _mostrar_meta(meta, poupancas: float, media:float, hoje:datetime.date):
     id_,nome,valor_alvo, prazo, criada_em, _= meta 
     valor_alvo = float(valor_alvo)
     falta = max(0.0, valor_alvo - poupancas)
-    pct = min(poupancas / valor_alvo * 100, 100) if valor_alvo > else 0
+    pct = min(poupancas / valor_alvo * 100, 100) if valor_alvo > 0 else 0
     barra = _barra_progresso(pct)
 
     print(f"[{id_}]{nome}")
     print(f"{barra} {poupancas:.0f}€ / {valor_alvo:.0f}€ ({pct:.0f}%)")
 
     if prazo:
-        prazo_dt = datetime.datetime.strftime(str(prazo), "%Y-%,-%d").date()
+        prazo_dt = datetime.datetime.strftime(str(prazo), "%Y-%m,-%d").date()
         dias_restantes = (prazo_dt - hoje).days 
         meses_rest = _meses_ate(str(prazo))
 
@@ -145,18 +145,17 @@ def _mostrar_meta(meta, poupancas: float, media:float, hoje:datetime.date):
             print("✅ Meta atingida!!!")
 
 def concluir_meta():
-    metas = fetch("SELECT id, nome,valor_alvo FROM metas WHERE conluida = 0")
-
+    meta = fetch("SELECT id, nome FROM metas WHERE concluida = 0")
     if not metas:
         print("\nSem metas ativas.")
         return
     
     print("\nMetas ativas:\n")
     for m in metas:
-        print(f" [{m[0]}] {m[1]} - {float(m[2]:.2f)}€")
+        print(f" [{m[0]}] {m[1]} - {float(m[2]):.2f}€")
     
     try:
-        id_meta = input("\nID da meta a concluir")
+        id_meta = int(input("\nID da meta a concluir"))
     except ValueError:
         print("ID inválido.")
         return 
@@ -175,7 +174,7 @@ def _verificar_concluidas(poupancas: float):
     for id_,nome,valor_alvo in metas:
         if poupancas >= float(valor_alvo):
             execute(
-                "UPDATE metas SET concluida=1, concluida_em=%s WHERE id_%s"
+                "UPDATE metas SET concluida=1, concluida_em=%s WHERE id%s",
                 (hoje,id_)
             )
             print(f"\n 🏆 Meta atingida automaticamente: '{nome}' - {float(valor_alvo):.2f}€!!!")
@@ -188,7 +187,7 @@ def verificar_metas_risco()->list[str]:
 
     for id_,nome,valor_alvo,prazo in metas:
         valor_alvo = float(valor_alvo)
-        falta  max(0.0,valor_alvo- poupancas)
+        falta = max(0.0,valor_alvo- poupancas)
         if falta<=0:
             continue
         meses_rest =_meses_ate(str(prazo))
@@ -196,3 +195,23 @@ def verificar_metas_risco()->list[str]:
         if media <por_mes *0.8:
             avisos.append(f"Meta '{nome}': precisas {por_mes:.2f}€/mês, poupas {media:.2f}€/mês")
     return avisos
+
+def painel_metas_dashboard() -> list[dict]:
+    metas     = fetch("SELECT id, nome, valor_alvo, prazo FROM metas WHERE concluida = 0")
+    poupancas = _poupancas_atuais()
+    resultado = []
+ 
+    for id_, nome, valor_alvo, prazo in metas:
+        valor_alvo = float(valor_alvo)
+        pct        = min(poupancas / valor_alvo * 100, 100) if valor_alvo > 0 else 0
+        falta      = max(0.0, valor_alvo - poupancas)
+        resultado.append({
+            "nome":       nome,
+            "valor_alvo": valor_alvo,
+            "poupancas":  poupancas,
+            "pct":        pct,
+            "falta":      falta,
+            "prazo":      str(prazo) if prazo else None,
+        })
+ 
+    return resultado

@@ -20,6 +20,10 @@ from graficos import grafico_categorias, grafico_intervalo
 from orcamento import definir_orcamento, ver_orcamento, orcamento_dashboard
 from poupancas import poupancas
 from conversa import interpretar
+from metas import (
+    criar_meta, ver_metas,
+    concluir_meta, painel_metas_dashboard, verificar_metas_risco,
+)
 # ──────────────────────────────────────────────────────────────────────────
 console = Console()
 
@@ -106,7 +110,34 @@ def painel_orcamento():
         Panel(t4, border_style=DIM, box=box.ROUNDED, padding=(0, 2)),
     ]
     console.print(Padding(Columns(cards, equal=True, expand=True), (1, 2)))
+# ── Painel de metas
+    metas_ativas = painel_metas_dashboard()
+    if metas_ativas:
+        console.print(Padding(Text("  METAS ATIVAS", style=f"dim {DIM}"), (0, 2)))
+        meta_cards = []
+        for m in metas_ativas[:4]:
+            barra_cheia = int(m["pct"] / 5)
+            barra = "+" * barra_cheia + "*" * (20 - barra_cheia)
+            cor   = ACCENT if m["pct"] >= 100 else WARN if m["pct"] >= 60 else TEXT
+            t = Text()
+            t.append(m["nome"][:18] + "\n",style=f"bold {TEXT}")
+            t.append(barra[:12] + "\n",style=f"{cor}")
+            t.append(f"{m['poupancas']:.0f}€ / {m['valor_alvo']:.0f}€", style=f"dim {DIM}")
+            t.append(f"({m['pct']:.0f}%)\n",style=f"bold {cor}")
+            if m["prazo"]:
+                t.append(f"Prazo: {m['prazo']}", style=f"dim {DIM}")
+            else:
+                t.append(f"Faltam {m['falta']:.2f}€", style=f"dim {DIM}")
+            meta_cards.append(Panel(t, border_style=DIM, box=box.ROUNDED, padding=(0, 1)))
+        console.print(Padding(Columns(meta_cards, equal=True, expand=True), (0, 2)))
 
+    avisos = verificar_metas_risco()
+    for aviso in avisos:
+        a = Text()
+        a.append("⚠️", style=f"bold {WARN}")
+        a.append(aviso,    style=f"{WARN}")
+        console.print(Padding(a, (0, 2)))
+    console.print()
 # ─── MENUS ────────────────────────────────────────────────────────────────
 
 def _render_menu(titulo_painel: str, itens: list):
@@ -141,6 +172,7 @@ def menu_principal():
         ("4", "Definir orçamento"),
         ("5", "Ver orçamento mensal"),
         ("6", "Modo Conversa"),
+        ("7", "Metas de poupancas"),
         ("0", "Sair"),
     ])
 
@@ -211,7 +243,44 @@ def menu_ver_graficos():
             console.print()
             Prompt.ask(f"  [{DIM}]prima Enter para continuar[/]", default="", console=console)
 
+def menu_metas():
+    while True:
+        limpar_terminal()
+        header()
+        _render_menu("metas de poupança", [
+            ("1", "Ver metas e progresso"),
+            ("2", "Criar nova meta"),
+            ("3", "Concluir meta"),
+            ("0", "← Voltar"),
+        ])
 
+        escolha = Prompt.ask(f"  [{ACCENT}]›[/] escolha", console=console)
+        limpar_terminal()
+
+        if escolha == "0":
+            break
+
+        header()
+        titulos = {
+            "1": "metas de poupança",
+            "2": "criar nova meta",
+            "3": "concluir meta",
+        }
+        if escolha in titulos:
+            console.print(Rule(f"[{DIM}]{titulos[escolha]}[/]", style=DIM))
+            console.print()
+
+        if escolha == "1":
+            ver_metas()
+        elif escolha == "2":
+            criar_meta()
+        elif escolha == "3":
+            concluir_meta()
+        else:
+            console.print(f"\n  [{DANGER}]✗ Opção inválida.[/]\n")
+
+        if escolha in titulos:
+            _aguardar()
 def modo_conversa():
     limpar_terminal()
     header()
@@ -320,6 +389,8 @@ def main():
             _aguardar()
         elif escolha == "6":
             modo_conversa()
+        elif escolha == "7":
+            menu_metas()
         elif escolha == "0":
             limpar_terminal()
             msg = Text()
