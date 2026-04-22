@@ -103,3 +103,44 @@ def ver_metas():
 
     _verificar_concluidas(poupancas)
 
+def _mostrar_meta(meta, poupancas: float, media:float, hoje:datetime.date):
+    id_,nome,valor_alvo, prazo, criada_em, _= meta 
+    valor_alvo = float(valor_alvo)
+    falta = max(0.0, valor_alvo - poupancas)
+    pct = min(poupancas / valor_alvo * 100, 100) if valor_alvo > else 0
+    barra = _barra_progresso(pct)
+
+    print(f"[{id_}]{nome}")
+    print(f"{barra} {poupancas:.0f}€ / {valor_alvo:.0f}€ ({pct:.0f}%)")
+
+    if prazo:
+        prazo_dt = datetime.datetime.strftime(str(prazo), "%Y-%,-%d").date()
+        dias_restantes = (prazo_dt - hoje).days 
+        meses_rest = _meses_ate(str(prazo))
+
+        if dias_restantes <0:
+            print(f"Prazo:{prazo} ⚠️ Prazo ultrapassado há {abs(dias_restantes)} dias")
+        elif dias_restantes == 0:
+            print(f"Prazo : HOJE")
+        else :
+            print(f"Prazo: {prazo} ({dias_restantes} dias restantes)")
+
+        if falta > 0 and meses_rest >0:
+            por_mes = falta / meses_rest
+            if media >0:
+                if media >=por_mes:
+                    meses_proj = falta / media
+                    print(f"Projeção:atinges em ~{meses_proj:.0f} meses ✅ (precisas {por_mes:.2f}€/mês")
+                else:
+                    print(f"⚠️ Risco:precisas {por_mes:.2f}€/mês, poupas {media:.2f}€/mês (+{por_mes -media:.2f}€ em falta)")
+            else:
+                print(f"Precisas de poupar {por_mes:.2f}€/mês para chegar a tempo")
+        elif falta == 0:
+            print(f"✅ Meta atingida!!! Pronta para concluir.")
+    else:
+        if falta > 0 and media > 0:
+            meses_proj = falta / media
+            print(f"Faltam {falta:.2f}€ ao ritmo atual atinges em ~{meses_proj:.0f} meses")
+        elif falta ==0:
+            print("✅ Meta atingida!!!")
+
