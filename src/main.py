@@ -21,7 +21,7 @@ from orcamento import definir_orcamento, ver_orcamento, orcamento_dashboard
 from poupancas import poupancas
 from conversa import interpretar
 from metas import (
-    criar_meta, ver_metas,
+    criar_meta, ver_metas,remover_meta,
     concluir_meta, painel_metas_dashboard, verificar_metas_risco,
 )
 # ──────────────────────────────────────────────────────────────────────────
@@ -242,6 +242,7 @@ def menu_metas():
             ("1", "Ver metas e progresso"),
             ("2", "Criar nova meta"),
             ("3", "Concluir meta"),
+            ("4", "Remover meta"),
             ("0", "← Voltar"),
         ])
 
@@ -256,6 +257,7 @@ def menu_metas():
             "1": "metas de poupança",
             "2": "criar nova meta",
             "3": "concluir meta",
+            "4": "remover_meta",
         }
         if escolha in titulos:
             console.print(Rule(f"[{DIM}]{titulos[escolha]}[/]", style=DIM))
@@ -267,6 +269,8 @@ def menu_metas():
             criar_meta()
         elif escolha == "3":
             concluir_meta()
+        elif escolha == "4":
+            remover_meta()
         else:
             console.print(f"\n  [{DANGER}]✗ Opção inválida.[/]\n")
 

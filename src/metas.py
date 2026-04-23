@@ -132,7 +132,7 @@ def _mostrar_meta(meta, poupancas: float, media:float, hoje:datetime.date):
                     meses_proj = falta / media
                     print(f"Projeção:atinges em ~{meses_proj:.0f} meses ✅ (precisas {por_mes:.2f}€/mês")
                 else:
-                    print(f"⚠️ Risco:precisas {por_mes:.2f}€, tens poupado {media:.2f}€ (+{por_mes -media:.2f}€ em falta)")
+                    print(f"⚠️ Risco:precisas {por_mes:.2f}€/mês, tens poupado {media:.2f}€ (+{por_mes -media:.2f}€ em falta)")
             else:
                 print(f"Precisas de poupar {por_mes:.2f}€/mês para chegar a tempo")
         elif falta == 0:
@@ -143,6 +143,28 @@ def _mostrar_meta(meta, poupancas: float, media:float, hoje:datetime.date):
             print(f"Faltam {falta:.2f}€ ao ritmo atual atinges em ~{meses_proj:.0f} meses")
         elif falta ==0:
             print("✅ Meta atingida!!!")
+
+def remover_meta():
+    metas= fetch("SELECT id, nome, valor_alvo FROM metas WHERE concluida = 0")
+    if not metas:
+        print("\nSem metas ativas.")
+        return
+
+    print("\nMetas ativas:\n")
+    for m in metas:
+        print(f"[{m[0]}] {m[1]} - {float(m[2]):.2f}€")
+
+    try:
+        id_meta = int(input("\n ID da meta a remover: "))
+    except ValueError:
+        print("ID inválido.")
+        return 
+    confirmar = input("Tens a certeza? (s/n): ").strip().lower()
+    if confirmar != "s":
+        print("Cancelada.")
+        return
+    execute("DELETE FROM metas WHERE id=%s", (id_meta,))
+    print("✅ Meta removida")
 
 def concluir_meta():
     metas = fetch("SELECT id, nome,valor_alvo FROM metas WHERE concluida = 0")
