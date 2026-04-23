@@ -69,10 +69,20 @@ def normalizar(texto : str) -> str:
 
 def add_despesa():
     criar_tabela_keywords()
-    montante = float(input("Valor (€): "))
+    try:
+        montante = float(input("Valor (€): "))
+        if montante <=0:
+            print("⚠️O valor deve ser maior que 0.")
+            return 
+    except ValueError:
+        print("❌ Valor inválido.")
+        return
+    
     
     descricao = input("Descrição: ").strip()
-    
+    if not descricao:
+        print("❌ Descrição não pode estar vazia.")
+        return 
     categoria_id = escolher_categoria(descricao)
     if categoria_id is None:
         return 
@@ -83,17 +93,22 @@ def add_despesa():
     print("Despesa adicionada com sucesso!!!")
 
 def carregar_categorias():
-    sql = "SELECT nome FROM categorias"
-    categorias = [c[0] for c in fetch(sql)]
-    return categorias
+    try:
+        sql = "SELECT nome FROM categorias"
+        categorias = [c[0] for c in fetch(sql)]
+        return categorias
+    except Exception as e:
+        print(f"❌Erro ao carregar categorias: {e}")
+        return 
 
 def ver_despesas():
     sql = """
         SELECT d.valor, c.nome, d.descricao, d.data
         FROM despesas d 
         JOIN categorias c ON d.categoria_id = c.id
+        ORDER BY d.id DESC
     """
-    despesas = fetch(sql)
+    despesas = fetch(sql) 
         
     print("\nLista de despesas:\n")
     for d in despesas:
@@ -130,7 +145,8 @@ def ver_despesas_categoria():
             print(f"Despesa: {d[0]:.2f}€ | Categoria: {d[1]} | Descrição: {d[2]} | Data: {d[3]}")
 def ver_despesas_mes():
     mes = input("Mês (1-12)")
-
+    if not mes.isdigit() or not (1<= int(mes) <= 12):
+        print("❌Mês inválido")
     sql = """
     SELECT d.valor, c.nome, d.descricao, d.data
     FROM despesas d 
@@ -205,6 +221,7 @@ def aprender_keyword(descricao: str, categoria_id: int):
     execute(sql,(palavra,categoria_id,categoria_id))
 
 def escolher_categoria(descricao: str) ->int | None:
+    
     categorias = carregar_categorias()
     sugestao = sugerir_categoria(descricao)
 
@@ -213,10 +230,14 @@ def escolher_categoria(descricao: str) ->int | None:
         aceitar = input("Aceitar? (Enter para confirmar, 'n' para escolher outra): ").strip().lower()
         
         if aceitar != "n":
-            sql = "SELECT id FROM categorias WHERE nome=%s"
-            categoria_id = fetch(sql, (sugestao,))[0][0]
-            aprender_keyword(descricao, categoria_id)
-            return categoria_id
+            try:
+                sql = "SELECT id FROM categorias WHERE nome=%s"
+                categoria_id = fetch(sql, (sugestao,))[0][0]
+                aprender_keyword(descricao, categoria_id)
+                return categoria_id
+            except Exception as e:
+                print(f"❌ Erro ao obter categoria: {e}")
+                return None
 
     print("\n Cateorias disponiveis: ")
     for categoria in categorias:
@@ -225,28 +246,44 @@ def escolher_categoria(descricao: str) ->int | None:
     
     while True:
         categoriaEscolhida = input("\n Escolha uma categoria: ").strip()
+        if not categoriaEscolhida:
+            print("❌ Não podes deixar a categoria em branco.")
+            continue 
+        categoria_match = None
+        for cat in categorias:
+            if normalizar(cat) == normalizar(categoriaEscolhida):
+                categoria_match = cat  # guarda o nome original da BD
+                break
+        if categoria_match:
+            try:
+                sql = "SELECT id FROM categorias WHERE nome=%s"
+                categoria_id = fetch(sql, (categoriaEscolhida,))[0][0]
 
-        if categoriaEscolhida in categorias:
-            sql = "SELECT id FROM categorias WHERE nome=%s"
-            categoria_id = fetch(sql, (categoriaEscolhida,))[0][0]
-
-            aprender_keyword(descricao, categoria_id)
-            return categoria_id
+                aprender_keyword(descricao, categoria_id)
+                return categoria_id
+            except Exception as e:
+                print(f"❌Erro ao selecionar cetegoria: {e}")
+                return None 
         
-        print("Categoria inválida")
+        print("Categoria não disponivel na lista")
         opcao = input("  Deseja criar uma nova categoria? (s/n): ").strip().lower()
  
         if opcao == "s":
-            execute("INSERT INTO categorias (nome) VALUES (%s)", (categoriaEscolhida,))
-            print("  Categoria criada com sucesso!")
-            categoria_id = fetch("SELECT id FROM categorias WHERE nome=%s", (categoriaEscolhida,))[0][0]
-            aprender_keyword(descricao, categoria_id)
-            return categoria_id
+            try:
+                execute("INSERT INTO categorias (nome) VALUES (%s)", (categoriaEscolhida,))
+                print("  Categoria criada com sucesso!")
+                categoria_id = fetch("SELECT id FROM categorias WHERE nome=%s", (categoriaEscolhida,))[0][0]
+                aprender_keyword(descricao, categoria_id)
+                return categoria_id
+            except Exception as e:
+                print(f"Erro ao criar categoria: {e}")
+                return None 
         elif opcao == "n":
-            print("  A voltar ao menu principal...")
+            print("A voltar ao menu principal...")
             return None
         else:
-            print("  Opção inválida.")
+            print("Opção inválida.")
+
 def remover_despesa():
     sql = """
     SELECT d.id,d.valor,c.nome,d.descricao,d.data
@@ -307,8 +344,11 @@ def editar_despesa():
     valor, categoria_id, descricao, data = resultado[0]
 
     print ("\nPressiona ENTER para manter o valor atual.\n")
-
-    novo_valor = input(f"Valor ({valor}€): ")
+    try:
+        novo_valor = float(input(f"Valor ({valor}€): "))
+    except ValueError:
+        print("❌ Valor inválido.")
+        return 
     nova_desc = input(f"Descricao ({descricao}): ")
 
     novo_valor = float(novo_valor) if novo_valor else valor 
