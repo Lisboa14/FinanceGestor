@@ -144,6 +144,49 @@ def _mostrar_meta(meta, poupancas: float, media:float, hoje:datetime.date):
         elif falta ==0:
             print("✅ Meta atingida!!!")
 
+def editar_meta():
+    metas = fetch("SELECT id,nome,valor_alvo, prazo FROM metas WHERE concluida=0")
+    if not metas:
+        print("\nSem metas ativas para editar.")
+        return
+    
+    print("\nMetas ativas:\n")
+    for m in metas:
+        prazo_str =str(m[3]) if m[3] else "sem prazo"
+        print(f"[{m[0]}] {m[1]} - {float(m[2]):.2f}€ - prazo: {prazo_str}")
+    try:
+        id_meta = int(input("\n  ID da meta a editar: "))
+    except ValueError:
+        print("  ID inválido.")
+        return
+ 
+    meta = fetch("SELECT id, nome, valor_alvo, prazo FROM metas WHERE id=%s", (id_meta,))
+    if not meta:
+        print("  Meta não encontrada.")
+        return
+ 
+    _, nome, valor_alvo, prazo = meta[0]
+    print("\n  Prima Enter para manter o valor atual.\n")
+ 
+    novo_nome  = input(f"  Nome ({nome}): ").strip() or nome
+    novo_valor = input(f"  Valor alvo ({float(valor_alvo):.2f}€): ").strip()
+    novo_prazo = input(f"  Prazo ({prazo or 'sem prazo'}): ").strip()
+ 
+    novo_valor = float(novo_valor) if novo_valor else float(valor_alvo)
+    if novo_prazo:
+        try:
+            datetime.datetime.strptime(novo_prazo, "%Y-%m-%d")
+        except ValueError:
+            print("  Data inválida, prazo mantido."); novo_prazo = str(prazo) if prazo else None
+    else:
+        novo_prazo = str(prazo) if prazo else None
+ 
+    execute(
+        "UPDATE metas SET nome=%s, valor_alvo=%s, prazo=%s WHERE id=%s",
+        (novo_nome, novo_valor, novo_prazo, id_meta)
+    )
+    print("✅Meta atualizada com sucesso!")
+
 def remover_meta():
     metas= fetch("SELECT id, nome, valor_alvo FROM metas WHERE concluida = 0")
     if not metas:
