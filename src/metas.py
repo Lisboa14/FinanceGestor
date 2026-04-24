@@ -45,10 +45,17 @@ def criar_meta():
     prazo = None 
     if prazo_str:
         try:
-            datetime.datetime.strptime(prazo_str, "%Y-%m-%d")
-            prazo = prazo_str 
+            data_prazo = datetime.datetime.strptime(prazo_str, "%Y-%m-%d").date()
+            hoje = datetime.date.today()
+
+            if data_prazo < hoje:
+                print("❌ Não podes definir um prazo no passado. Meta criada sem prazo.")
+                prazo = None
+            else:
+                prazo = data_prazo.strftime("%Y-%m-%d")
+
         except ValueError:
-            print("Formato de data inválido. MEta criada sem prazo")
+            print("❌ Formato de data inválido (usa YYYY-MM-DD). Meta criada sem prazo.")
             prazo = None 
     hoje = datetime.date.today().strftime("%Y-%m-%d")
     execute(
@@ -169,15 +176,41 @@ def editar_meta():
     print("\n  Prima Enter para manter o valor atual.\n")
  
     novo_nome  = input(f"  Nome ({nome}): ").strip() or nome
-    novo_valor = input(f"  Valor alvo ({float(valor_alvo):.2f}€): ").strip()
+    while True:
+        novo_valor_input = input(f"  Valor alvo ({float(valor_alvo):.2f}€): ").strip()
+
+        if not novo_valor_input:
+            novo_valor = float(valor_alvo)
+            break
+
+        try:
+            novo_valor = float(novo_valor_input)
+
+            if novo_valor <= 0:
+                print("⚠️ O valor deve ser maior que 0.")
+                continue
+
+            break
+
+        except ValueError:
+            print("❌ Valor inválido. Introduz um número válido.")
     novo_prazo = input(f"  Prazo ({prazo or 'sem prazo'}): ").strip()
  
     novo_valor = float(novo_valor) if novo_valor else float(valor_alvo)
     if novo_prazo:
         try:
-            datetime.datetime.strptime(novo_prazo, "%Y-%m-%d")
+            data_prazo = datetime.datetime.strptime(novo_prazo, "%Y-%m-%d").date()
+            hoje = datetime.date.today()
+
+            if data_prazo < hoje:
+                print("❌ Não podes definir um prazo no passado. Prazo mantido.")
+                novo_prazo = str(prazo) if prazo else None
+            else:
+                novo_prazo = data_prazo
+
         except ValueError:
-            print("  Data inválida, prazo mantido."); novo_prazo = str(prazo) if prazo else None
+            print("❌ Data inválida. Usa o formato YYYY-MM-DD. Prazo mantido.")
+            novo_prazo = str(prazo) if prazo else None
     else:
         novo_prazo = str(prazo) if prazo else None
  
@@ -220,10 +253,22 @@ def concluir_meta():
         print(f" [{m[0]}] {m[1]} - {float(m[2]):.2f}€")
     
     try:
-        id_meta = int(input("\nID da meta a concluir"))
+        id_meta = int(input("\nID da meta a concluir: "))
     except ValueError:
         print("ID inválido.")
-        return 
+        return
+    meta = fetch("SELECT nome, concluida FROM metas WHERE id=%s", (id_meta,))
+    
+    if not meta:
+        print("❌ Meta não existe.")
+        return
+
+    nome, concluida = meta[0]
+
+    if concluida:
+        print(f"⚠️ A meta '{nome}' já está concluída.")
+        return
+    
     hoje = datetime.date.today().strftime("%Y-%m-%d")
     execute(
         "UPDATE metas SET concluida=1, concluida_em=%s WHERE id=%s",
