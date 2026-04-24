@@ -5,6 +5,7 @@ import datetime
 from db import fetch
 from orcamento import orcamento_dashboard
 from despesas import total_despesas
+from metas import painel_metas_dashboard, verificar_metas_risco
 
 def normalizar(texto: str) -> str:
     texto = texto.lower().strip()
@@ -31,7 +32,7 @@ INTENCOES = {
     ],
     "maior_gasto":[
         r"maior gasto",
-        r"despesa mais (alta|elevado|grande)",
+        r"despesa mais (alta|elevada|grande)",
         r"quanto foi o maximo",
         r"despesa maior",
         r"gasto mais alto",
@@ -44,11 +45,10 @@ INTENCOES = {
     ],
     "orcamento_estado":[
         r"(estou|eu estou) (dentro|fora) do orcamento",
-        r"como (esta|anda) o (meu )? orcamento",
-        r"quanto (me|tenho)? (resta|restante|disponivel)",
-        r"(tenho|quanto tenho) disponivel",
-        r"estado do orçamento",
-        r"orçamento",
+        r"como (esta|anda) o (meu) orcamento",
+        r"quanto tenho disponivel",
+        r"estado do orcamento",
+        r"orcamento",
     ],
     "media_categoria":[
         r"media (em|de|na|no) (\w+)",
@@ -87,10 +87,26 @@ INTENCOES = {
         r"total anual",
     ],
     "poupancas_atuais":[
-        r"(quanto|minhas|as minhas) poupanças",
+        r"(quanto|minhas|as minhas) poupancas",
         r"quanto poupei",
         r"total (de|das|em) poupanças",
         r"saldo (de|das) poupanças",
+    ],
+    "metas_progresso": [
+        r"(como estao|estado das|ver) metas",
+        r"progresso das metas",
+        r"quanto falta para (a meta|as metas)",
+        r"metas de poupancas",
+        r"as minhas metas",
+    ],
+    "meta_especifica": [
+        r"quanto falta para (a meta)?([\w\s]+)",
+        r"progresso (da meta)?([\w\s]+)",
+        r"como esta a meta ([\w\s]+)",
+    ],
+    "meta_em_risco": [
+        r"metas em risco",
+        r"(quais|que) metas (estao em risco)",
     ],
     "ajuda":[
         r"ajuda",
@@ -255,6 +271,55 @@ def _poupancas_atuais()->str:
         return "Ainda não há registos de poupancas para este mês."
     return f"As tuas poupancas acumuladas até este mês são {float(resultado[0][0]):.2f}€."
 
+def _metas_progresso() -> str:
+    metas = painel_metas_dashboard()
+    if not metas:
+        return "Ainda não tens metas definidas. Cria uma no menu [7]."
+
+    linhas = []
+    for m in metas:
+        barra_cheia = int(m["pct"] / 10)
+        barra = "█" * barra_cheia + "░" * (10 - barra_cheia)
+        linha = f"{m['nome']}: {barra} {m['pct']:.0f}%  ({m['poupancas']:.0f}€ / {m['valor_alvo']:.0f}€)"
+        if m["prazo"]:
+            linha += f"  · prazo: {m['prazo']}"
+        else:
+            linha += f"  · faltam {m['falta']:.2f}€"
+        linhas.append(linha)
+
+    return "As tuas metas ativas:\n" + "\n".join(linhas)
+
+
+def _meta_especifica(match) -> str:
+    grupos = [g for g in match.groups() if g and len(g) > 2]
+    if not grupos:
+        return "Não percebi o nome da meta. Tenta: 'quanto falta para a meta viagem?'"
+    nome_procurado = normalizar(grupos[-1])
+
+    metas = painel_metas_dashboard()
+    for m in metas:
+        if nome_procurado in normalizar(m["nome"]):
+            barra_cheia = int(m["pct"] / 10)
+            barra = "█" * barra_cheia + "░" * (10 - barra_cheia)
+            resposta = (
+                f"Meta: {m['nome']}\n"
+                f"Progresso: {barra} {m['pct']:.0f}%\n"
+                f"Poupanças: {m['poupancas']:.2f}€ / {m['valor_alvo']:.2f}€\n"
+                f"Faltam: {m['falta']:.2f}€"
+            )
+            if m["prazo"]:
+                resposta += f"\nPrazo: {m['prazo']}"
+            return resposta
+
+    return f"Não encontrei nenhuma meta com o nome '{grupos[-1]}'."
+
+
+def _metas_em_risco() -> str:
+    avisos = verificar_metas_risco()
+    if not avisos:
+        return "✓ Todas as metas estão no bom caminho!"
+    return "⚠ Metas em risco:\n" + "\n".join(f"  · {a}" for a in avisos)
+
 def _ajuda()->str:
     return (
         "Podes perguntar-me coisas como:\n"
@@ -312,6 +377,12 @@ def _executar(intencao: str, match, texto_original: str) -> str:
         return _total_ano()
     elif intencao == "poupancas_atuais":
         return _poupancas_atuais()
+    elif intencao == "metas_progresso":
+        return _metas_progresso()
+    elif intencao == "meta_especifica":
+        return _meta_especifica()
+    elif intencao == "meta_em_risco":
+        return _metas_em_risco()
     elif intencao == "ajuda":
         return _ajuda()
     return "Não sei responder a isso ainda."

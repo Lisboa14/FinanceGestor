@@ -65,7 +65,6 @@ def ver_orcamento():
 
     mes_atual = datetime.datetime.now().strftime("%Y-%m")
 
-    print("\n  ORÇAMENTOS\n")
     print(f"  {'Mês':<12} {'Orçamento':>12} {'Gasto':>10} {'Restante':>10} {'%':>7}  Estado")
     print("  " + "─" * 62)
 

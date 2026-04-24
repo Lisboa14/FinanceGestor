@@ -239,7 +239,7 @@ def _verificar_concluidas(poupancas: float):
     for id_,nome,valor_alvo in metas:
         if poupancas >= float(valor_alvo):
             execute(
-                "UPDATE metas SET concluida=1, concluida_em=%s WHERE id%s",
+                "UPDATE metas SET concluida=1, concluida_em=%s WHERE id=%s",
                 (hoje,id_)
             )
             print(f"\n 🏆 Meta atingida automaticamente: '{nome}' - {float(valor_alvo):.2f}€!!!")

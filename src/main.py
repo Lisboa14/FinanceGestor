@@ -161,7 +161,7 @@ def menu_principal():
         ("2", "Ver despesas"),
         ("3", "Gráficos"),
         ("4", "Definir orçamento"),
-        ("5", "Ver orçamento mensal"),
+        ("5", "Ver orçamentos mensais"),
         ("6", "Modo Conversa"),
         ("7", "Metas de poupancas"),
         ("0", "Sair"),
@@ -382,7 +382,7 @@ def main():
 
         elif escolha == "5":
             header()
-            console.print(Rule(f"[{DIM}]orçamento mensal[/]", style=DIM))
+            console.print(Rule(f"[{DIM}]orçamentos mensais[/]", style=DIM))
             console.print()
             ver_orcamento()
             _aguardar()
