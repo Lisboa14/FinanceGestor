@@ -17,18 +17,16 @@ def normalizar(texto: str) -> str:
     return texto
 
 INTENCOES = {
-    "total_mes_atual":[
-        r"quanto gastei (este mes|este|no mes|no mes atual)",
-        r"total (do|deste|no) mes",
-        r"gastos (do|deste|no) mes",
-        r"quanto gastei",
-        r"total de gastos",
-    ],
     "total_categoria":[
         r"quanto gastei em (\w+)",
         r"gastos em (\w+)",
         r"total (em|de|na|no) (\w+)",
-        r"quanto foi em (\w+)",
+    ],
+     "total_mes_atual":[
+        r"quanto gastei (este mes|no mes|no mes atual)",
+        r"total (do|deste) mes",
+        r"gastos (do|deste|no) mes",
+        r"total de gastos",
     ],
     "maior_gasto":[
         r"maior gasto",
@@ -53,7 +51,6 @@ INTENCOES = {
     "media_categoria":[
         r"media (em|de|na|no) (\w+)",
         r"quanto gasto em media (em|de|na|no) (\w+)",
-        r"media de gastos em (\w+)",
     ],
     "mes_mais_caro":[
         r"mes mais caro",
@@ -62,9 +59,8 @@ INTENCOES = {
         r"mes com mais gastos",
     ],
     "categoria_mais_cara":[
-        r"(categoria|area) (onde|em que) (mais gastei| gastei mais)",
+        r"(categoria|area) (onde|em que) (mais gastei|gastei mais)",
         r"onde gastei mais",
-        r"categoria mias cara",
         r"maior categoria",
         r"em que categoria gastei mais",
     ],
@@ -77,30 +73,27 @@ INTENCOES = {
     "ultimo_gasto":[
         r"ultimo gasto",
         r"ultima despesa",
-        r"(o que|qual foi) (o ultimo|a ultima) (gasto|despesa|compra)",
+        r"(o que|qual) foi (o ultimo|a ultima) (gasto|despesa|compra)",
         r"ultima compra",
     ],
     "total_ano":[
-        r"quanto gastei (este ano|no ano| em \d{4})",
-        r"total (do|deste|no) ano",
+        r"total (do|deste) ano",
         r"gastos (do|deste|no) ano",
         r"total anual",
     ],
     "poupancas_atuais":[
         r"(quanto|minhas|as minhas) poupancas",
         r"quanto poupei",
-        r"total (de|das|em) poupanças",
-        r"saldo (de|das) poupanças",
+        r"saldo (de|das) poupancas",
     ],
     "metas_progresso": [
         r"(como estao|estado das|ver) metas",
         r"progresso das metas",
-        r"quanto falta para (a meta|as metas)",
+        r"quanto falta para as metas",
         r"metas de poupancas",
         r"as minhas metas",
     ],
     "meta_especifica": [
-        r"quanto falta para (a meta)?([\w\s]+)",
         r"progresso (da meta)?([\w\s]+)",
         r"como esta a meta ([\w\s]+)",
     ],
@@ -111,7 +104,7 @@ INTENCOES = {
     "ajuda":[
         r"ajuda",
         r"help",
-        r"o que (podes|posso|consigo) perguntar",
+        r"o que (posso|consigo) perguntar",
         r"que perguntas",
         r"exemplos",
         r"comandos",
@@ -123,7 +116,8 @@ def _total_mes_atual() -> str:
     SELECT SUM(valor) FROM despesas
     WHERE DATE_FORMAT(data,'%Y-%m') = %s 
     """
-    total = fetch(sql, (mes,))[0][0] or 0
+    res = fetch(sql, (mes,))
+    total = float(res[0][0]) if res and res[0][0] else 0
     return f"Gastaste {float(total):.2f}€ este mês ({mes})."
 
 def _total_categoria(texto_original:str, match)->str:
@@ -136,6 +130,7 @@ def _total_categoria(texto_original:str, match)->str:
     SELECT SUM(d.valor), c.nome FROM despesas d 
     JOIN categorias c ON d.categoria_id = c.id 
     WHERE LOWER(c.nome) LIKE %s 
+    GROUP BY c.nome 
     LIMIT 1
     """
 
@@ -180,7 +175,7 @@ def _orcamento_estado()-> str:
     emoji = "✅" if restante >= 0 else "❌"
     return (
         f"{emoji} Estás {estado} do orçamento.\n"
-            f"Orçamento: {orcamento_val:.2f}€ | Gasto: {gasto:.2f}€ | Dispobível: {restante:.2f}€"
+            f"Orçamento: {orcamento_val:.2f}€ | Gasto: {gasto:.2f}€ | Disponível: {restante:.2f}€"
     )
 
 def _media_categoria(match) -> str:
@@ -380,7 +375,7 @@ def _executar(intencao: str, match, texto_original: str) -> str:
     elif intencao == "metas_progresso":
         return _metas_progresso()
     elif intencao == "meta_especifica":
-        return _meta_especifica()
+        return _meta_especifica(match)
     elif intencao == "meta_em_risco":
         return _metas_em_risco()
     elif intencao == "ajuda":
