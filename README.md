@@ -12,7 +12,7 @@
 
 **Gestão financeira pessoal direto no teu terminal.**
 
-[![Python](https://img.shields.io/badge/Python-3.8%2B-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0%2B-4479A1?style=flat-square&logo=mysql&logoColor=white)](https://www.mysql.com/)
 [![Rich](https://img.shields.io/badge/Rich-TUI-00e5b0?style=flat-square)](https://github.com/Textualize/rich)
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)](LICENSE)
@@ -24,62 +24,76 @@
 
 ## ✦ O que é o FinanceGestor?
 
-O **FinanceGestor** é uma aplicação de terminal (TUI) para gestão financeira pessoal, construída em Python com uma interface elegante powered by [Rich](https://github.com/Textualize/rich). Regista despesas, define orçamentos mensais, acompanha as tuas poupanças e visualiza os teus gastos por categoria — tudo sem sair do terminal.
+O **FinanceGestor** é uma aplicação de terminal (TUI) para gestão financeira pessoal, construída em Python com uma interface powered by [Rich](https://github.com/Textualize/rich). Regista despesas, define orçamentos mensais, acompanha poupanças, define metas de poupança, visualiza gráficos e faz perguntas em linguagem natural sobre as tuas finanças — tudo sem sair do terminal.
 
 ---
 
 ## ✦ Funcionalidades
 
-| Módulo | Funcionalidade |
+| Módulo | Funcionalidades |
 |---|---|
-| 💸 **Despesas** | Adicionar, listar, filtrar por categoria, mês ou data |
-| 📊 **Orçamento** | Definir orçamento mensal e acompanhar o progresso |
-| 🏦 **Poupanças** | Cálculo automático acumulado mês a mês |
-| 📈 **Gráficos** | Gráficos circulares por categorias com `matplotlib` |
-| 🖥️ **Dashboard** | Cards em tempo real com orçamento, gastos e poupanças |
+| 💸 **Despesas** | Adicionar, editar, remover e filtrar por categoria, mês ou data. Categorização automática por palavras-chave com aprendizagem |
+| 📊 **Orçamento** | Definir orçamento mensal com validações, ver histórico de todos os meses e acompanhar o progresso |
+| 🏦 **Poupanças** | Cálculo automático acumulado mês a mês com base no orçamento e gastos reais |
+| 🎯 **Metas** | Criar metas de poupança com prazo, acompanhar progresso com barra visual, alertas de risco e conclusão automática |
+| 📈 **Gráficos** | Gráfico por categorias circulares e por intervalo de datas com `matplotlib` |
+| 💬 **Modo Conversa** | Perguntas em linguagem natural — "quanto gastei este mês?", "onde gasto mais?", "como estão as metas?" |
+| 🖥️ **Dashboard** | Cards com orçamento, gastos, poupanças e metas ativas |
 
 ---
 
 ## ✦ Preview
 
 ```
-──────────────────────────────────────────────────────────────
-◈ FINANCEGESTOR                  Monday, 13 de April de 2026  09:31
-──────────────────────────────────────────────────────────────
+──────────────────────────────────────────────────────────────────────
+◈ FINANCEGESTOR                    Monday, 13 de April de 2026  09:31
+──────────────────────────────────────────────────────────────────────
 
   ╭─────────────╮  ╭─────────────╮  ╭─────────────╮  ╭─────────────╮
-  │ ORÇAMENTO   │  │ GASTO       │  │ DISPONÍVEL  │  │ Poupanças   │
+  │ ORÇAMENTO   │  │ GASTO       │  │ DISPONÍVEL  │  │ POUPANÇAS   │
   │ 1.500,00 €  │  │ 430,50      │  │ 1.069,50 €  │  │ 2.134,20 €  │
   ╰─────────────╯  ╰─────────────╯  ╰─────────────╯  ╰─────────────╯
 
-  ╭──── Menu Principal ─────╮
-  │  [1] → Adicionar despesa│
-  │  [2] → Ver despesas     │
-  │  [3] → Gráficos         │
-  │  [4] → Definir orçamento│
-  │  [5] → Ver orçamento    │
-  │  [0] → Sair             │
-  ╰─────────────────────────╯
+  METAS ATIVAS
+  ╭──────────────────╮  ╭──────────────────╮
+  │ Viagem Londres   │  │ Portátil novo    │
+  │ ████████░░░░     │  │ ███░░░░░░░░      │
+  │ 340€ / 800€ 42%  │  │ 180€ / 1000€ 18% │
+  │ Prazo: 2025-08   │  │ Prazo: 2025-12   │
+  ╰──────────────────╯  ╰──────────────────╯
+
+  ╭──────────────────────────────────Menu Principal───────────────────────────────╮
+  │                              [1] → Adicionar despesa                          │
+  │                              [2] → Ver despesas                               │
+  │                              [3] → Gráficos                                   │
+  │                              [4] → Definir orçamento                          │
+  │                              [5] → Ver orçamento mensal                       │
+  │                              [6] → Modo Conversa                              │
+  │                              [7] → Metas de poupança                          │
+  │                              [0] → Sair                                       │
+  ╰───────────────────────────────────────────────────────────────────────────────╯
 ```
 
 ---
 
 ## ✦ Tecnologias Utilizadas
 
-- **[Python 3.8+](https://www.python.org/)** — Linguagem principal
-- **[MySQL](https://www.mysql.com/)** — Base de dados relacional
-- **[mysql-connector-python](https://pypi.org/project/mysql-connector-python/)** — Connector Python ↔ MySQL
-- **[Rich](https://github.com/Textualize/rich)** — Interface TUI (tabelas, painéis, cores, prompts)
-- **[Matplotlib](https://matplotlib.org/)** — Visualização de dados (gráfico de pizza)
+| Tecnologia | Versão | Uso |
+|---|---|---|
+| [Python](https://www.python.org/) | 3.10+ | Linguagem principal |
+| [MySQL](https://www.mysql.com/) | 8.0+ | Base de dados relacional |
+| [mysql-connector-python](https://pypi.org/project/mysql-connector-python/) | 8.0+ | Ligação Python ↔ MySQL |
+| [Rich](https://github.com/Textualize/rich) | 13.0+ | Interface TUI (tabelas, painéis, cores, prompts) |
+| [Matplotlib](https://matplotlib.org/) | 3.5+ | Gráficos de visualização |
+| [python-dotenv](https://pypi.org/project/python-dotenv/) | 1.0+ | Gestão de variáveis de ambiente (.env) |
 
----
 ---
 
 ## ✦ Pré-requisitos
 
 Antes de instalar, garante que tens:
 
-- **Python 3.8+** → [download](https://www.python.org/downloads/)
+- **Python 3.10+** → [download](https://www.python.org/downloads/)
 - **MySQL 8.0+** → [download](https://dev.mysql.com/downloads/) ou via MAMP/XAMPP
 - **pip** (incluído com Python)
 - **Git** → [download](https://git-scm.com/)
@@ -95,125 +109,155 @@ git clone https://github.com/Lisboa14/FinanceGestor.git
 cd FinanceGestor
 ```
 
-### 2 — Criar ambiente virtual (recomendado)
+### 2 — Instalar dependências
 
 ```bash
-# Criar
-python -m venv venv
-
-# Ativar — Windows
-venv\Scripts\activate
-
-# Ativar — macOS / Linux
-source venv/bin/activate
+pip install mysql-connector-python rich matplotlib python-dotenv
 ```
 
-### 3 — Instalar dependências
+
+### 3 — Configurar variáveis de ambiente
+
+O projeto usa um ficheiro `.env` para guardar as credenciais da base de dados. Cria o ficheiro `.env` na raiz do projeto com base no `.env.example`:
 
 ```bash
-pip install mysql-connector-python rich matplotlib
+cp .env.example .env
 ```
 
-```bash
+Abre o `.env` e preenche com as tuas credenciais:
+
+```env
+DB_HOST=127.0.0.1
+DB_PORT=...
+DB_USER=root
+DB_PASSWORD=a_tua_password
+DB_NAME=financegestor
 ```
 
 ### 4 — Configurar a base de dados MySQL
 
-Abre o teu cliente MySQL (Workbench, TablePlus, terminal, etc.) e executa:
-
-```sql
-CREATE DATABASE financegestor CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
-USE financegestor;
-
-CREATE TABLE categorias (
-    id   INT AUTO_INCREMENT PRIMARY KEY,
-    nome VARCHAR(100) NOT NULL UNIQUE
-);
-
-CREATE TABLE despesas (
-    id           INT AUTO_INCREMENT PRIMARY KEY,
-    data         DATE         NOT NULL,
-    categoria_id INT          NOT NULL,
-    descricao    VARCHAR(255),
-    valor        DECIMAL(10,2) NOT NULL,
-    FOREIGN KEY (categoria_id) REFERENCES categorias(id)
-);
-
-CREATE TABLE orcamento (
-    id    INT AUTO_INCREMENT PRIMARY KEY,
-    mes   VARCHAR(7)    NOT NULL UNIQUE,  -- formato: YYYY-MM
-    valor DECIMAL(10,2) NOT NULL
-);
-
-CREATE TABLE poupancas (
-    id    INT AUTO_INCREMENT PRIMARY KEY,
-    mes   VARCHAR(7)    NOT NULL UNIQUE,  -- formato: YYYY-MM
-    valor DECIMAL(10,2) NOT NULL
-);
-```
-
-### 5 — Configurar a ligação à base de dados
-
-Abre `db.py` e ajusta as credenciais conforme o teu ambiente:
-
-```python
-# db.py
-def get_connection():
-    conn = mysql.connector.connect(
-        host="127.0.0.1",   # ou "localhost"
-        port=3306,           # porta padrão MySQL (MAMP usa 8889)
-        user="root",         # teu utilizador MySQL
-        password="root",     # a tua password MySQL
-        database="financegestor"
-    )
-    return conn
-```
-
-### 6 — Executar a aplicação
+Abre o teu cliente MySQL (Workbench, TablePlus, terminal, etc.) e executa o ficheiro SQL incluído no projeto:
 
 ```bash
+mysql -u root -p < DataBase.sql
+```
+
+Ou copia e executa o conteúdo de `DataBase.sql` manualmente. O script cria a base de dados, todas as tabelas e insere categorias iniciais (Alimentação, Transporte, Habitação, Saúde).
+
+As tabelas criadas são as seguintes:
+
+```
+categorias    — categorias de despesas
+despesas      — registo de todas as despesas
+orcamento     — orçamentos mensais
+poupancas     — poupanças acumuladas mês a mês
+metas         — metas de poupança com prazo e progresso
+palavra_chave — aprendizagem de categorização automática
+```
+
+### 5 — Executar a aplicação
+
+```bash
+cd src
 python main.py
 ```
 
 ---
 
-## ✦ Utilização Rápida
+## ✦ Utilização
 
-Após iniciar, navega pelo menu com os números do teclado:
+### Menu principal
+
+Navega com os números do teclado:
 
 ```
-[1] Adicionar despesa   → introduz valor, categoria e descrição
-[2] Ver despesas        → filtra por todas / categoria / mês / data
-[3] Gráficos            → gráficos circulares por categorias (abre janela)
-[4] Definir orçamento   → define o orçamento do mês atual (formato YYYY-MM)
-[5] Ver orçamento       → mostra orçamento, gastos e saldo do mês
+[1] Adicionar despesa     → valor, descrição e categoria (com sugestão automática)
+[2] Ver despesas          → todas / por categoria / por mês / por data / editar / remover
+[3] Gráficos              → por categoria ou por intervalo de datas
+[4] Definir orçamento     → orçamento mensal com validação de formato e data
+[5] Ver orçamento mensal  → histórico de todos os orçamentos com estado
+[6] Modo Conversa         → perguntas em linguagem natural
+[7] Metas de poupança     → criar, ver progresso, concluir metas
 [0] Sair
 ```
 
-O **dashboard no topo** atualiza automaticamente a cada vez que abres o menu principal, mostrando:
+### Categorização automática
 
-- 💰 Orçamento total do mês
-- 📉 Total gasto até agora
-- ✅ Valor disponível restante
-- 🏦 Poupanças acumuladas
+Ao adicionar uma despesa, o programa sugere automaticamente a categoria com base na descrição:
+
+```
+Valor (€): 9.99
+Descrição: Netflix
+
+  🪄 Sugestão automática: [Subscrições]
+  Aceitar? (Enter para confirmar, 'n' para escolher outra):
+```
+
+O sistema aprende com as tuas escolhas e melhora com o uso.
+
+### Modo Conversa
+
+Acede ao modo conversa com a opção `[6]` e faz perguntas em português:
+
+```
+› quanto gastei este mês?
+› quanto gastei em alimentação?
+› qual foi o maior gasto?
+› estou dentro do orçamento?
+› média em transportes
+› qual o mês mais caro?
+› onde gasto mais?
+› quantas despesas tenho?
+› último gasto
+› total do ano
+› quanto poupei?
+› como estão as metas?
+› quanto falta para a meta viagem?
+› metas em risco
+› ajuda
+```
+
+---
+
+## ✦ Estrutura do Projeto
+
+```
+FinanceGestor/
+├── src/
+│   ├── main.py          — ponto de entrada, dashboard e menus
+│   ├── despesas.py      — gestão de despesas e categorização automática
+│   ├── orcamento.py     — orçamentos mensais com validações
+│   ├── poupancas.py     — cálculo de poupanças acumuladas
+│   ├── metas.py         — metas de poupança com progresso e alertas
+│   ├── graficos.py      — gráficos com matplotlib
+│   ├── conversa.py      — modo conversa em linguagem natural
+│   └── db.py            — ligação à base de dados (lê do .env)
+├── DataBase.sql         — script SQL para criar a base de dados
+├── .env                 — credenciais locais (não vai para o GitHub)
+├── .gitignore
+├── LICENSE
+└── README.md
+```
 
 ---
 
 ## ✦ Dependências — Referência Completa
 
-| Pacote | Versão mínima | Uso |
-|---|---|---|
-| `mysql-connector-python` | 8.0+ | Ligação à base de dados MySQL |
-| `rich` | 13.0+ | Interface TUI (tabelas, painéis, cores) |
-| `matplotlib` | 3.5+ | Gráficos de visualização |
-| `datetime` | stdlib | Datas e formatação de meses |
-| `os` | stdlib | Limpeza do terminal |
+| Pacote | Versão mínima | Instalação | Uso |
+|---|---|---|---|
+| `mysql-connector-python` | 8.0+ | pip | Ligação à base de dados MySQL |
+| `rich` | 13.0+ | pip | Interface TUI (tabelas, painéis, cores) |
+| `matplotlib` | 3.5+ | pip | Gráficos de visualização |
+| `python-dotenv` | 1.0+ | pip | Leitura do ficheiro `.env` |
+| `re` | stdlib | — | Expressões regulares (categorização e validação) |
+| `unicodedata` | stdlib | — | Normalização de texto (remoção de acentos) |
+| `datetime` | stdlib | — | Datas e formatação de meses |
+| `os` | stdlib | — | Limpeza do terminal e caminhos de ficheiros |
 
-Instalar tudo de uma vez:
+Instalar todos os pacotes externos de uma vez:
 
 ```bash
-pip install mysql-connector-python rich matplotlib
+pip install mysql-connector-python rich matplotlib python-dotenv reportlab
 ```
 
 ---
@@ -240,10 +284,13 @@ git push origin feature/nova-funcionalidade
 
 ## ✦ Roadmap
 
-- [ ] Exportação de relatórios em PDF/CSV
-- [ ] Notificações quando o orçamento está quase esgotado
-- [ ] Gráfico de evolução das poupanças ao longo dos meses
-
+- [x] Registo e filtragem de despesas
+- [x] Orçamentos mensais com validação
+- [x] Poupanças acumuladas automáticas
+- [x] Categorização automática com aprendizagem
+- [x] Modo conversa em linguagem natural
+- [x] Metas de poupança com progresso e alertas
+- [x] Gráficos por categoria e por intervalo
 ---
 
 ## ✦ Licença
