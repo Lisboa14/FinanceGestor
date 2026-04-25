@@ -59,7 +59,7 @@ O **FinanceGestor** é uma aplicação de terminal (TUI) para gestão financeira
   │ Viagem Londres   │  │ Portátil novo    │
   │ ████████░░░░     │  │ ███░░░░░░░░      │
   │ 340€ / 800€ 42%  │  │ 180€ / 1000€ 18% │
-  │ Prazo: 2025-08   │  │ Prazo: 2025-12   │
+  │ Prazo: 2026-08   │  │ Prazo: 2026-12   │
   ╰──────────────────╯  ╰──────────────────╯
 
   ╭──────────────────────────────────Menu Principal───────────────────────────────╮
