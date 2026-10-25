@@ -104,7 +104,7 @@ def orcamento_dashboard():
         print("Nenhum orçamento definido para este mês")
         return
     
-    orcamento_valor = orcamento[0][0]
+    orcamento_valor = float(orcamento[0][0])
 
     total = fetch( """
         SELECT SUM(valor) FROM despesas
@@ -114,4 +114,4 @@ def orcamento_dashboard():
 
     restante = orcamento_valor - total
     
-    return restante 
+    return orcamento_valor, total, restante 

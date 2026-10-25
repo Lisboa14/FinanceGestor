@@ -1,27 +1,25 @@
-from db import fetch, execute
+from db import fetch
+from decimal import Decimal 
+import datetime
 
-def poupancas(mes, orcamento, despesas):
 
+def poupancas():
+    mes_atual = datetime.datetime.now().strftime("%Y-%m")
     sql = """
-    SELECT valor FROM poupancas
-    WHERE mes < %s 
-    ORDER BY mes DESC 
-    LIMIT 1 
+        SELECT COALESCE(SUM(saldo), 0)
+        FROM (
+            SELECT
+                o.mes,
+                o.valor - COALESCE(SUM(d.valor), 0) AS saldo
+            FROM orcamento o
+            LEFT JOIN despesas d
+                ON DATE_FORMAT(d.data, '%Y-%m') = o.mes
+            WHERE o.mes < %s
+            GROUP BY o.mes, o.valor
+        ) AS saldos_mensais
     """
-    resultado = fetch(sql, (mes ,))
 
-    poupancas_anteriores = resultado[0][0] if resultado else 0
+    resultado = fetch(sql, (mes_atual,))
+    total = resultado[0][0] if resultado else 0
 
-    saldo = orcamento - despesas
-    novas_poupancas = poupancas_anteriores + saldo
-
-    sql_insert = """
-    INSERT INTO poupancas (mes, valor)
-    VALUES (%s, %s)
-    ON DUPLICATE KEY UPDATE valor = %s 
-    """    
-
-    execute(sql_insert, (mes, novas_poupancas,novas_poupancas))
-
-    return novas_poupancas
-    
+    return Decimal(str(total))    

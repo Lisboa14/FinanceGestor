@@ -57,9 +57,8 @@ def header():
 
 
 def painel_orcamento():
-    restante = orcamento_dashboard()
-
-    if restante is None:
+    resultado = orcamento_dashboard()
+    if resultado is None:
         # Sem orçamento definido — mostra aviso simples
         aviso = Text()
         aviso.append("  ⚠  ", style=f"bold {WARN}")
@@ -71,12 +70,16 @@ def painel_orcamento():
         console.print()
         return
 
+    orcamento_val, gasto_mes, restante = resultado
+
+    orcamento_val = float(orcamento_val)
+    gasto_mes = float(gasto_mes)
     restante = float(restante)
+
     mes = datetime.now().strftime("%Y-%m")
     gasto = float(total_despesas() or 0)
-    
-    orcamento_val = gasto + restante  # orçamento = gasto + restante
-    cofre = poupancas(mes, orcamento_val , gasto)
+
+    cofre = poupancas()
     # Cor do restante
     if restante < 0:
         cor_rest = DANGER
